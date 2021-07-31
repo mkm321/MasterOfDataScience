@@ -1,0 +1,20 @@
+m <- matrix(c(1,2,3,4), ncol=2, byrow=TRUE)
+print(m)
+
+x <- sqrt(2)
+sqr <- function(x) x^2
+print(sqr(x))
+
+irisD <- read.csv("iris.csv")
+# View(iris)
+head(irisD)
+summary(irisD)
+sapply(irisD, class)
+names(irisD)
+dim(irisD)
+summary(irisD)
+advertisingD <- read.csv("Advertising.csv")
+t.test(irisD)
+attach(advertisingD)
+head(advertisingD)
+itemFrequencyPlot(groceriesDataSet,topN=20,type="absolute")
