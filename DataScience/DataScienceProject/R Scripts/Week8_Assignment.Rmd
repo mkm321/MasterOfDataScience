@@ -1,0 +1,242 @@
+---
+title: "Week8 Assignment"
+author: "Mohit Mehndiratta"
+date: "23/09/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Principal Component Analysis
+
+## Question 1
+
+### 1. Load "iris" dataset from the ISLR Library.
+
+```{r}
+library(ISLR)
+attach(iris)
+```
+
+### 2. Give a short description of the dataset.
+
+```{r}
+head(iris)
+str(iris)
+summary(iris)
+dim(iris)
+cor(iris[,1:4])
+```
+
+The iris data set has 150 observations of 5 variables. The variables are *"Sepal.Length"*, *"Sepal.Width"*, *"Petal.Length"*, *"Petal.Width"*, *"Species"*. All are numeric variables except "Species".
+
+### 3. Examine the mean of the variables in the dataset.
+
+```{r}
+iris_DS <- iris[,1:4]
+sapply(iris_DS, mean)
+```
+
+The mean of the variables do not vary much except "Petal.Width".
+
+### 4. Examine the variance of the variables in the dataset.
+
+```{r}
+sapply(iris_DS, var)
+```
+
+The variance of the variables do vary from each other. High variance is observed in "Sepal.Length" & "Petal.Width". While "Sepal.Width" & "Petal.Length" has much less variance compared to them.
+
+### 5. Perform Principal Component Analysis for the iris dataset.
+```{r}
+pr.out.iris <- prcomp(iris_DS, scale. = TRUE)
+pr.out.iris
+```
+
+For the 4 variables, we got 4 Principal component loading vectors.
+
+```{r}
+cat("Standard Deviation of original variables are ", pr.out.iris$scale)
+cat("Standard Deviation of Principal Component vectors are ", pr.out.iris$sdev)
+```
+
+### 6. Display and explain the principal component loading vectors.
+
+```{r}
+pr.out.iris$rotation
+```
+
+PCA for the iris data set gives 4 Principal Component Vectors. Those are PC1, PC2, PC3 & PC4.
+
+Here we can observe, majority and almost equal contributions are given by : \n
+For, PC1 - Sepal.Length, Petal.Length & Petal.Width. PC2 - Sepal.Width. PC3 - Sepal.Length & Petal.Width. PC4 - Petal.Length & Petal.Width.\n
+
+
+### 7. Give the first two Principal components using loading parameters in part 6.
+```{r}
+pc1.iris.vector <- pr.out.iris$rotation[,1]
+PC1.iris <- pc1.iris.vector[[1]] * Sepal.Length + pc1.iris.vector[[2]]* Sepal.Width +
+            pc1.iris.vector[[3]] * Petal.Length + pc1.iris.vector[[4]]* Petal.Width
+
+pc2.iris.vector <- pr.out.iris$rotation[,2]
+PC2.iris <- pc2.iris.vector[[1]] * Sepal.Length + pc2.iris.vector[[2]]* Sepal.Width +
+            pc2.iris.vector[[3]] * Petal.Length + pc2.iris.vector[[4]]* Petal.Width
+PC1.iris; PC2.iris
+```
+
+### 8. Explain the proportion of variance explained by each PC using graphs and summarise your results.
+```{r}
+summary(pr.out.iris)
+pr.out.iris$var <- pr.out.iris$sdev ^ 2
+PVE.iris <- pr.out.iris$var / sum(pr.out.iris$var)
+PVE.iris
+plot(PVE.iris, type = "b", xlab = "Pricipal Components", ylab = "Proportions of Variance explained")
+```
+
+From the results, we can see that maximum proportion is explained by PC1 which is 72.9% followed by PC2 which explains 22.8% proportions of variance. While PC3 and PC4 explained 3.6% and 0.5% respectively.
+
+If we consider the cumulative proportions, then we can see that 95% of the total proportions of variance are explained by PC1 and PC2.
+
+### 9. Draw the biplot and interpret it.
+```{r}
+biplot(pr.out.iris, scale = 0)
+```
+
+From the above plot, we can see that Petal.Length and Petal.Width are very close to horizontal axis(from (0,0)). This means that they have more weightage toward PC1. 
+
+Sepal.Length is somewhat closed to PC1 as well as PC2, but it gives more weightage toward PC1.
+
+While, Sepal.Width is very close to vertical axis, thus more contributions towards PC2.
+
+To check which of the variables are associated with each other or correlated with each other, we can focus on angle between the variables. 
+
+we can see that angle of Petal.Length, Petal.Width are very close to each other and in same direction that means they are highly positive correlated with each other.
+
+On the other hand, angles of Petal.Length, Petal.Width are nearly 90 degrees with respect to Sepal.Width therefore, they seem uncorrelated towards them.
+
+Sepal.Length is somewhat positively correlated with Petal.Length and Petal.Width.
+
+### 10. Rotate the graph and compare the results.
+```{r}
+pr.out.iris$rotation <- -pr.out.iris$rotation
+pr.out.iris$x <- -pr.out.iris$x
+biplot(pr.out.iris, scale = 0)
+```
+
+With the rotations, we can see the clear difference toward magnitude/direction in each of the variable as they are opposite as compared towards previous graph, but the interpretations are similar about correlations.
+
+## Question 2
+
+### 1. Load the “USArrests” dataset built in R.
+
+```{r}
+arrest <- USArrests
+attach(arrest)
+
+```
+
+### 2. Give a short description of the dataset.
+
+```{r}
+head(arrest)
+dim(arrest)
+str(arrest)
+summary(arrest)
+cor(arrest)
+```
+
+The USArrest data set has 50 observations of 4 variables. The variables are *"Murder"*, *"Assault"*, *"UrbanPop"* and *"Rape"*. All are numeric variables.
+
+### 3. Examine the mean of the variables in the dataset.
+
+```{r}
+sapply(arrest, mean)
+```
+
+Here, we can see that mean of the variables vary alot. Means are given as : 
+1. Murder - 7.788
+2. Assault - 170.76
+3. UrbanPop - 65.54
+4. Rape - 21.232
+
+### 4. Examine the variance of the variables in the dataset.
+
+```{r}
+sapply(arrest, var)
+```
+
+The variance of the variables do vary from each other. High variance is observed in "Assault" & "UrbanPop". While "Rape" has much less variance compared to them. Murder has the lowest variance out of all.
+
+### 5. Perform Principal Component Analysis for USArrests.
+```{r}
+pr.out.arrest <- prcomp(arrest, scale. = TRUE)
+pr.out.arrest
+```
+
+For the 4 variables, we got 4 Principal component loading vectors.
+
+```{r}
+cat("Standard Deviation of original variables are ", pr.out.arrest$scale)
+cat("Standard Deviation of Principal Component vectors are ", pr.out.arrest$sdev)
+```
+
+### 6. Display and explain the principal component loading vectors.
+
+```{r}
+pr.out.arrest$rotation
+```
+
+PCA for the USArrest data set gives 4 Principal Component Vectors. Those are PC1, PC2, PC3 & PC4.
+
+Here we can observe, majority and almost equal contributions are given by :
+For, PC1 - Murder, Assault & Rape. PC2 - UrbanPop. PC3 - Rape. PC4 - Murder & Assault\n
+
+### 7. Give the first two Principal components using loading parameters in part 6.
+```{r}
+pc1.arrest.vector <- pr.out.arrest$rotation[,1]
+PC1.arrest <- pc1.arrest.vector[[1]]*Murder + pc1.arrest.vector[[2]]*Assault + 
+       pc1.arrest.vector[[3]]*UrbanPop + pc1.arrest.vector[[4]]*Rape
+pc2.arrest.vector <- pr.out.arrest$rotation[,2]
+PC2.arrest <- pc2.arrest.vector[[1]]*Murder + pc2.arrest.vector[[2]]*Assault + 
+       pc2.arrest.vector[[3]]*UrbanPop + pc2.arrest.vector[[4]]*Rape
+PC1.arrest; PC2.arrest
+```
+
+### 8. Explain the proportion of variance explained by each PC using graphs and summarise your results.
+```{r}
+summary(pr.out.arrest)
+pr.out.arrest$var <- pr.out.arrest$sdev ^ 2
+PVE.arrest <- pr.out.arrest$var / sum(pr.out.arrest$var)
+PVE.arrest
+plot(PVE.arrest, type = "b", xlab = "Pricipal Components", ylab = "Proportions of Variance explained")
+```
+
+From the results, we can see that maximum proportion is explained by PC1 which is 62.01% followed by PC2 which explains 24.74% proportions of variance. While PC3 and PC4 explained 8.9% and 4.3% respectively.
+
+If we consider the cumulative proportions, then we can see that 95.66% of the total proportions of variance are explained by PC1,PC2 and PC3.
+
+### 9. Draw the biplot and interpret it.
+```{r}
+biplot(pr.out.arrest, scale = 0)
+```
+
+From the above plot, we can see that Murder, Assault and Rape are very close to horizontal axis(from (0,0)). This means that they have more weightage toward PC1. 
+
+While, UrbanPop is very close to vertical axis, thus more contributions towards PC2.
+
+To check which of the variables are associated with each other or correlated with each other, we can focus on angle between the variables. 
+
+we can see that angle of Murder, Assault and Rape are close to each other and in same direction that means they are highly positive correlated with each other.
+
+On the other hand, angles of Murder, Assault and Rape are nearly 90 degrees with respect to UrbanPop therefore, they seem uncorrelated towards them.
+
+### 10. Rotate the graph and compare the results.
+```{r}
+pr.out.arrest$rotation <- -pr.out.arrest$rotation
+pr.out.arrest$x <- -pr.out.arrest$x
+biplot(pr.out.arrest, scale = 0)
+```
+
+With the rotations, we can see the clear difference toward magnitude/direction in each of the variable as they are opposite as compared towards previous graph, but the interpretations are similar about correlations.

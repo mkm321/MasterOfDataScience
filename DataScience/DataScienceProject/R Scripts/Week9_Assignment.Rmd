@@ -1,0 +1,224 @@
+---
+title: "Week9 Assignment"
+author: "Mohit Mehndiratta"
+date: "30/09/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Clustering
+## Question 1
+
+### Use the iris dataset built in R.
+```{r}
+library(ISLR)
+irisDS <- iris
+head(irisDS)
+attach(irisDS)
+dim(irisDS)
+str(irisDS)
+```
+
+The iris data set has 150 Observations of 5 variables. All variables are numeric except Species.
+
+## Part (a): k-means clustering
+In clustering we try to divide the data into groups as per their similarities. Here we ignore the categorical variable and only use predictor variables.
+
+### 1. Cluster the dataset into 2 groups using k-means clustering. 
+
+```{r}
+km.iris <- kmeans(irisDS[, 1:4], centers = 2, nstart = 20)
+km.iris
+```
+
+The above output displays the data set converted into 2 clusters using k-means clustering. 
+
+The "cluster means" in the output shows the centroid information of 2 clusters based on the predictor variables. The "clustering vector" depicts which observation represents what clusters. Here we can see that most of the observations belong to second cluster. 
+
+The total withinss of the clusters depicts the total sum of squares obtained from every cluster. 
+```{r}
+km.iris$tot.withinss
+```
+
+The output shows the total sum of squares obtained from clusters. The total sum of squares is "152.348"
+
+### 2. Draw a plot to visualize the clusters.
+
+We can use PCA for visualisation.
+
+```{r}
+pca.iris <- prcomp(irisDS[,1:4], scale. = TRUE)
+plot(pca.iris$x[,1:2], col = km.iris$cluster + 1)
+```
+
+### 3. Cluster the dataset into 3 groups using k-means clustering. 
+
+```{r}
+km.iris3 <- kmeans(irisDS[, 1:4], centers = 3, nstart = 20)
+km.iris3
+```
+
+The above output displays the data set converted into 3 clusters using k-means clustering. 
+
+The "cluster means" in the output shows the centroid value of 2 clusters based on the predictor variables. The "clustering vector" depicts which observation represents what clusters.
+
+The total withinss of the clusters depicts the total sum of squares obtained from every cluster. 
+```{r}
+km.iris3$tot.withinss
+```
+
+The output shows the total sum of squares obtained from clusters. The total sum of squares is "78.85144".
+
+Here, we can see that total sum of squares of 3 clusters is less than that of 2 clusters. This means that the observations are much more closer for 3 clusters. Thus due to small value of sum of squares, cluster 3 is better than cluster 2.
+
+### 4. Draw a plot to visualize the clusters.
+
+```{r}
+plot(pca.iris$x[,1:2], col = km.iris3$cluster + 1)
+```
+
+## Part (b): Hierarchical Clustering
+
+### 1. Cluster the observations using complete linkage.
+```{r}
+hh.complete <- hclust(dist(iris[,1:4]), method = "complete")
+hh.complete
+
+```
+
+### 2. Cluster the observations using average and single linkage. 
+Hierarchical clustering using average linkage
+```{r}
+hh.average <- hclust(dist(iris[,1:4]), method = "average")
+hh.average
+```
+Hierarchical clustering using single linkage
+```{r}
+hh.single <- hclust(dist(iris[,1:4]), method = "single")
+hh.single
+```
+
+### 3. Plot the dendrogram for the above clustering methods.
+```{r}
+## Dendogram for complete linkage
+plot(hh.complete, main = "Complete Linkage")
+```
+
+```{r}
+## Dendogram for Average linkage
+plot(hh.average, main = "Average Linkage")
+```
+
+```{r}
+## Dendogram for Single linkage
+plot(hh.single, main = "Single Linkage")
+```
+
+## Question 2
+### Generate the data set using the following codes
+
+```{r}
+set.seed(2)
+x = matrix(rnorm(50*2), ncol = 2) 
+x[1:25, 1]= x[1:25, 1] + 3 
+x[1:25, 2] = x[1:25, 2] - 4
+class(x)
+x <- as.data.frame(x)
+head(x)
+dim(x)
+```
+
+Here we can see that we have 50 Observations of 2 variables. Both the variables are numeric in nature.
+
+## Part (a): k-means clustering
+### 1. Cluster the data set into 2 groups using k-means clustering.
+```{r}
+km.mat <- kmeans(x, centers = 2, nstart = 20)
+km.mat
+```
+
+```{r}
+km.mat$tot.withinss
+```
+The output shows the total sum of squares obtained from clusters. The total sum of squares is "128.6066"
+
+### 2. Draw a plot to visualize the clusters.
+
+```{r}
+pca.mat <- prcomp(x, scale. = TRUE)
+plot(pca.mat$x[,1:2], col = km.mat$cluster + 1)
+```
+
+### 3. Cluster the data set into 3 groups using k-means clustering.
+```{r}
+km.mat1 <- kmeans(x, centers = 3, nstart = 20)
+km.mat1
+```
+
+```{r}
+km.mat1$tot.withinss
+```
+The output shows the total sum of squares obtained from clusters. The total sum of squares is "97.97927".
+
+### 4. Draw a plot to visualize the clusters.
+```{r}
+plot(pca.mat$x[,1:2], col = km.mat1$cluster + 1)
+```
+
+### 5. Compare the total within-cluster sum of squares when nstart = 1 and 20.
+
+Comparing total within-cluster sum of squares when nstart = 1 and 20 for 2 group clusters
+```{r}
+km.mat_1 <- kmeans(x, centers = 2, nstart = 1)
+cat("Total within cluster sum of squares when nstart = 1 is", km.mat_1$tot.withinss)
+cat("Total within cluster sum of squares when nstart = 20 is", km.mat$tot.withinss)
+```
+
+Comparing total within-cluster sum of squares when nstart = 1 and 20 for 3 group clusters
+```{r}
+km.mat1_1 <- kmeans(x, centers = 3, nstart = 1)
+
+cat("Total within cluster sum of squares when nstart = 1 is", km.mat1_1$tot.withinss)
+cat("Total within cluster sum of squares when nstart = 20 is", km.mat1$tot.withinss)
+```
+
+
+## Part (b): Hierarchical Clustering
+
+### 1. Cluster the observations using complete linkage.
+Hierarchical clustering using complete linkage
+```{r}
+hh.complete_mat <- hclust(dist(x), method = "complete")
+hh.complete_mat
+```
+
+### 2. Cluster the observations using average and single linkage. 
+Hierarchical clustering using average linkage
+```{r}
+hh.average_mat <- hclust(dist(x), method = "average")
+hh.average_mat
+```
+Hierarchical clustering using single linkage
+```{r}
+hh.single_mat <- hclust(dist(x), method = "single")
+hh.single_mat
+```
+
+### 3. Plot the dendrogram for the above clustering methods.
+```{r}
+## Dendogram for complete linkage
+plot(hh.complete_mat, main = "Complete Linkage")
+```
+
+```{r}
+## Dendogram for Average linkage
+plot(hh.average_mat, main = "Average Linkage")
+```
+
+```{r}
+## Dendogram for Single linkage
+plot(hh.single_mat, main = "Single Linkage")
+```

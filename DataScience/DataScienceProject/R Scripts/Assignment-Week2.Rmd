@@ -1,0 +1,256 @@
+---
+title: "Assignment-Week2"
+author: "Mohit Mehndiratta"
+data: "05/08/2021"
+output: word_document
+---
+
+## Question 1
+
+### Part (a) - Upload the Advertising dataset and explore it.
+
+```{r}
+Advertising <- read.csv("../datasets/advertising.csv")
+head(Advertising)
+attach(Advertising)
+dim(Advertising)
+sapply(Advertising, mean)
+sapply(Advertising, var)
+sapply(Advertising, class)
+```
+
+From here, we can observe that Advertising Data set has 200 Observations of 4 variables and all the variables are numeric.
+
+### Part(b) - Construct scatter plots to visualize the relationship between following variables:
+
+### • Sales and TV
+
+### • Sales and Radio
+
+### • Sales and Newspaper
+
+```{r}
+par(mfrow=c(1,3))
+plot(Sales~TV)
+plot(Sales~Newspaper)
+plot(Sales~Radio)
+```
+
+1. For Sales vs TV plot, we can see that there is a linear relationship between Sales and TV as the we can see the constant increase in number of Sales. But at the end we can observe that plot is a bit more scattered thus there is a chance of high errors.
+
+2. For Sales vs Newspaper plot, we can see that plot is heavily spread and have mixed values. It's hard to depict any relationship between Sales and Newspaper as of now.
+
+3. For Sales vs Radio plot, we can see that the Sales are going up as Radio advertisements are increasing. There is some spread as well which can possible generate errors as well but as of now it is safe to assume that there exists a positive linear relationship.
+
+### Part(c) - Find the Correlation Coefficient to measure the strength of the linear relationship of Sales and TV
+
+```{r}
+cor(Sales, TV)
+```
+
+As we can see, Correlation Coefficient between Sales and TV is 0.7822244. As per the correlation coefficient if it is closer to one that means there is a strong positive relationship between the variables.
+
+Since the value is closer to 1 therefore from that we can say that the relationship between Sales and TV is somewhat strong but not very strong. We can safely assume that if TV advertisement go up then there is 78% chance that Sales would go up too.
+
+### Part(d) - Find the least square estimates of the linear model of Sales in terms of TV and give the resulting model
+
+```{r}
+model1 <- lm(Sales~TV)
+summary(model1)
+```
+
+From the above summary, we can see that the least square estimates for the linear model between Sales and TV are 7.032594 and 0.047537 with the standard error as 0.457843 and 0.002691 .
+
+As per our model equation -> E(Y) = b0 + b1(X), where Y is Sales and X is TV. We can find the value for B0^ and B1^ as 7.032594 and 0.047537 respectively.
+
+### Part(e) - Assess the accuracy of the parameter estimates
+
+To Assess the accuracy of parameters we can observe the standard error with respect to coefficients. Since the smaller the error the better the coefficients, we can see that errors are quite small for the estimated values of intercept and slope. Since the standard errors are quite small as compared to estimated values we can say that they are somewhat accurate.
+
+```{r}
+confint(model1)
+```
+
+we can also check the accuracy from confidence interval as well. As we can see 0 is not in between the lower and upper limit therefore we can reject the null hypothesis and can safely say that there is a relationship between Sales and TV.
+
+### part(f) - Test the significance of the slope of the linear model
+
+For this we can use hypothesis testing. While looking at confidence interval none of the ranges have 0 in them. Therefore we can reject the null hypothesis.
+
+Also, by looking at the p-values for 5% significance, we can see that p-value is much closer to zero and less than 0.05. Therefore we have a strong evidence to reject the null hypothesis and thus it states that there is a significant linear relationship between Sales and TV.
+
+### part(g) - Plot the straight line within the scatter plot and comment
+
+```{r}
+plot(Sales~TV)
+abline(c(7.032594, 0.047537), col="red")
+```
+
+here as per the plot we can see that the line is rising upward which means the sales are increasing with more TV advertisement stating a relationship between them. But it seems like the variance is increasing also and we need to check our assumptions.
+
+### part(h) - Assess the overall accuracy of the model
+
+After, seeing the Residual standard error in the summary which is 3.259. We can check the Sales summary and then we can compare the error.
+
+```{r}
+summary(Sales)
+```
+
+So, for the summary we can observe that the Residual standard error or standard deviation seems to be high, which is not good.
+
+By looking at the summary we can see that value for R squared is 61.19%, which means 61.19 % is the proportion of variable explained by the model. The higher the squared, the better is the model. Therefore, it is somewhat better.
+
+We can also check our basics assumptions which are : 
+1. LINEARITY
+2. NORMALITY (NORMAL DISTRIBUTION)
+3. CONSTANT VARIANCE ASSUMPTION (Heteroscedasticity)
+
+```{r}
+par(mfrow=c(2,2))
+plot(model1)
+```
+
+For Linearity:
+if this assumption has to be valid then the plot for Residual vs fitted should be scattered/random and there should not be any pattern. Since we can see pattern here then we can say that Linearity assumption is not valid and same thing is reflecting in scale-location vs Fitted values plot.
+
+For Heteroscedasticity:
+if this assumption has to be valid then the plot for Residual vs fitted should spread constantly or the variance should be constant throughout. But here also we can see that the the spread is not constant, therefore this assumption is also not valid.
+
+For Normality:
+if this assumption has to be valid then the plot for Normal Q-Q vs Theoretical Quantities has to have all the plots aligned to the straight line but we do not have all points lied on the straight line therefore, this assumption is also not valid.
+
+Since, our assumptions are not valid this means that there is more room to improve this model.
+
+### Part(i) - Use the model to make predictions
+
+```{r}
+predict(model1, list(TV=400))
+```
+For predictions our model is predicting the Sales of 26.04725 when TV advertisement reaches 400.
+ 
+ 
+## Question 2
+
+### Part (a) - Upload the Auto Dataset and explore it.
+
+```{r}
+Auto <- read.csv("../datasets/auto.csv")
+head(Auto)
+attach(Auto)
+dim(Auto)
+sapply(Auto, mean)
+sapply(Auto, var)
+sapply(Auto, class)
+```
+
+From here, we can observe that Auto Data set has 397 Observations of 9 variables. The data set is about the various specifications of the different cars.
+
+### Part(b) - Construct scatter plots to visualize the relationship between following variables:
+
+### • mpg and displacement 
+
+
+### • mpg and weight
+
+### • mpg and acceleration
+
+```{r}
+par(mfrow=c(1,3))
+plot(mpg~displacement)
+plot(mpg~weight)
+plot(mpg~acceleration)
+```
+
+1. For mpg vs displacement plot, we can see that there is a mix of mpg values when displacement is low for various cars. But when displacement is large, mpg is going down. Therefore, it looks like we have a negative relationship between them.
+
+2. For mpg vs weight plot, we can see that heavy cars have low mpg as compared to light weight cars. The plot is depicting a negative linear relationship between mpg and weight.
+
+3. For mpg vs acceleration plot, the scatter plot is heavily spread and have mixed values. It's hard to depict any relationship between mpg and acceleration as of now.
+
+### Part(c) - Find the Correlation Coefficient to measure the strength of the linear relationship of mpg and weight.
+
+```{r}
+cor(mpg, weight)
+```
+
+As we can see, Correlation Coefficient between mpg and weight is -0.8317389. As per the correlation coefficient if it is closer to -1 that means there is a strong negative relationship between the variables.
+
+Since the value is closer to -1 therefore, from that we can say that the relationship between mpg and weight is somewhat strong but not very strong. We can safely assume that the light weight cars should have high mpg.
+
+### Part(d) - Find the least square estimates of the linear model of mpg in terms of weight. and give the resulting model
+
+```{r}
+model2 <- lm(mpg~weight)
+summary(model2)
+```
+
+From the above summary, we can see that the least square estimates for the linear model between mpg and weights are 46.3173992 and -0.0076766 with the standard error as 0.7962915 and 0.0002578 .
+
+As per our model equation -> E(Y) = b0 + b1(X), where Y is mpg and X is weight. We can find the value for B0^ and B1^ as 46.3173992 and -0.0076766 respectively.
+
+### Part(e) - Assess the accuracy of the parameter estimates
+
+To Assess the accuracy of parameters we can observe the standard error with respect to coefficients. Since the smaller the error the better the coefficients, we can see that errors are quite small for the estimated values of intercept and slope. Since the standard errors are quite small as compared to estimated values we can say that they are somewhat accurate.
+
+```{r}
+confint(model2)
+```
+
+we can also check the accuracy from confidence interval as well. As we can see 0 is not in between the lower and upper limit therefore we can reject the null hypothesis and can safely say that there is some relationship between mpg and weight.
+
+As, we can see the value for the slope is negative, from that we can evidently say that there exists a negative linear relationship.
+
+### part(f) - Test the significance of the slope of the linear model
+
+For this we can use hypothesis testing. While looking at confidence interval none of the ranges have 0 in them. Therefore we can reject the null hypothesis.
+
+Alternatively, by looking at the p-values for 5% significance, we can see that p-value is much closer to zero and less than 0.05. Therefore we have a strong evidence to reject the null hypothesis and thus it states that there is a significant linear relationship between mpg and displacement.
+
+### part(g) - Plot the straight line within the scatter plot and comment
+
+```{r}
+plot(mpg~weight)
+abline(c(46.3173992, -0.0076766), col="red")
+```
+
+here as per the plot we can see that the line is going downward which states that heavy cars have generally less mpg. But we can also see that there aren't any constant spread in the plot. We need to check our assumptions here.
+
+### part(h) - Assess the overall accuracy of the model
+
+After, seeing the Residual standard error in the summary which is 4.35. We can check the mpg summary and then we can compare the error.
+
+```{r}
+summary(mpg)
+```
+
+So, for the summary we can observe that the Residual standard error not seems to be high, which is good.
+
+By looking at the summary we can see that value for R squared is 69.18%, which means 69.18 % is the proportion of variable explained by the model. The higher the R-squared value, the better is the model. Therefore, we can say that it is somewhat better.
+
+We can also check our basics assumptions which are : 
+1. LINEARITY
+2. NORMALITY (NORMAL DISTRIBUTION)
+3. CONSTANT VARIANCE ASSUMPTION (Heteroscedasticity)
+
+```{r}
+par(mfrow=c(2,2))
+plot(model2)
+```
+
+For Linearity:
+if this assumption has to be valid then the plot for Residuals vs fitted should be scattered/random and there should not be any pattern. Since we can see pattern here then we can say that Linearity Assumption is not valid and same thing is reflecting in scale vs Fitted plot.
+
+For Heteroscedasticity:
+if this assumption has to be valid then the plot for Scale-Location vs Fitted values should spread constantly the variance should be constant throughout. But here also we can see that the the spread is not constant, therefore this assumption is also not valid.
+
+For Normality:
+if this assumption has to be valid then the plot for Normal Q-Q vs Theoretical Quantities has to have all the plots aligned to the straight line but we do not have all points lied on the straight line therefore, this assumption is also not valid.
+
+Since, our assumptions are not valid this means that there is more room to improve this model.
+
+### Part(i) - Use the model to make predictions
+
+```{r}
+predict(model2, list(weight=1300))
+```
+For predictions, our model is predicting that if car's weight is reduced to 1300 then the car should expect to have mpg around 36.33781.

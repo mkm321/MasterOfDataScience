@@ -1,0 +1,189 @@
+---
+title: "Week7 Assignment - Support Vector Machines"
+author: "Mohit Mehndiratta"
+date: "08/09/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1.Attach “Auto” dataset from ISLR library and explore.
+
+```{r}
+library(ISLR)
+attach(Auto)
+dim(Auto)
+head(Auto)
+str(Auto)
+summary(Auto)
+```
+
+There are 392 observations with 9 variables. The 9 variables are mpg, cylinders, displacement, horsepower, weight, acceleration, year, origin and name. Each variable is numeric except "name" as it is a factor variable.
+
+
+## Question 2. Use support vector approaches in order to predict whether a given car gets high or low gas mileage based on the “Auto” data set.
+
+### a. Create a binary variable that takes “1” for cars with gas mileage above median and “0” for cars with gas mileage below the median.
+
+Let's take out the median of the mpg variable.
+
+```{r}
+mpg_median <- median(mpg)
+cat("Median of the mpg variable is: ", mpg_median)
+```
+
+Now, creating a binary variable with the help of above calculated median value for mpg.
+
+```{r}
+mpg_code <- rep(0, nrow(Auto))
+mpg_code[mpg > mpg_median] = 1
+mpg_code
+str(mpg_code)
+```
+
+this new binary variable is numerical but we want a factor variable, so converting this variable into a factor variable.
+
+```{r}
+mpg_code <- as.factor(mpg_code)
+str(mpg_code)
+```
+
+For Classification, the data set needs filtering because we do not want to use mpg values as we created a binary variable for the same. Moreover, we cannot use name variable as well so removing that as well.
+
+And finally, adding the newly created binary variable "mpg_code" into the data set.
+
+```{r}
+Auto <- data.frame(Auto[, c(-1,-9)], mpg_code)
+head(Auto)
+```
+
+### b. Fit a support vector classifier to the data with various values of cost, in order to predict whether a car gets high or low gas mileage. Report the cross-validation errors associated with different values of this parameter. Comment on your results.
+
+In order to fit a support vector machine, we need to load the **"e1071"** library.
+
+```{r}
+library(e1071)
+```
+
+Data is divided into training and testing data set at 70% and 30% respectively.
+
+```{r}
+set.seed(10)
+tr <- sample(1: nrow(Auto), nrow(Auto) * 0.7)
+training_data <- Auto[tr,]
+testing_data <- Auto[-tr,]
+```
+
+Now, finding the best linear SVM model as per the cost value. Here, we will find the best cost parameter from 0.001, 0.01, 0.1, 1, 10, 100 and 1000.
+
+```{r}
+tune_linear_training <- tune(svm, mpg_code~., data = training_data, kernel = "linear", 
+                                          ranges = list(cost = c(0.001, 0.01, 0.1, 1, 10, 100, 1000)
+                                          ))
+summary(tune_linear_training)
+```
+
+According to the summary, cost value 1 is the best parameter which has lowest error value 0.09510582 and dispersion value 0.03936503.
+
+```{r}
+best_svm_linear_tr <- tune_linear_training$best.model ## it will give the best model
+summary(best_svm_linear_tr)
+```
+
+From the summary of the best model, Best linear model has the cost of 1 and number of support vectors are 69 out of which 34 support vectors are of class 0 and 35 support vectors are of class 1.
+
+**Checking the Accuracy of the model :**
+
+```{r}
+pred1 <- predict(best_svm_linear_tr, newdata = testing_data)
+
+# now for misclassification rate, construct misclassification table
+misclassification_table <- table(pred1, Observed = testing_data[, "mpg_code"])
+misclassification_table
+
+misclassification_rate <- (misclassification_table[1,2] + misclassification_table[2,1]) / sum(misclassification_table)
+misclassification_rate
+```
+
+This linear model gives us the misclassification rate of 6.77%.
+
+
+### c. Now repeat b), this time using SVMs with radial and polynomial basis kernels, with different values of gamma and degree and cost. Comment on your results.
+
+### Polynomials :
+
+For tuning the polynomial SVMs, degree is required. So providing a degree value range from 2 to 5.
+
+```{r}
+tune_polynomial_training <- tune(svm, mpg_code~., data = training_data, kernel = "polynomial", 
+                             ranges = list(cost = c(0.001, 0.01, 0.1, 1, 10, 100, 1000),
+                                           degree = c(2:5)
+                             ))
+summary(tune_polynomial_training)
+```
+
+According to the summary, best polynomial SVM has the cost value of 10 and degree of 3. This SVM has the lowest error value 0.09457672 and dispersion value 0.06164724.
+
+```{r}
+best_svm_polynomial_tr <- tune_polynomial_training$best.model ## it will give the best model
+summary(best_svm_polynomial_tr)
+```
+
+From the summary of the best model, Best Polynomial SVM has the cost of 10, degree 3 and number of support vectors are 72 out of which 34 support vectors are of class 0 and 38 support vectors are of class 1.
+
+**Checking the Accuracy of the model :**
+
+```{r}
+pred2 <- predict(best_svm_polynomial_tr, newdata = testing_data)
+
+# now for misclassification rate, construct misclassification table
+misclassification_table <- table(pred2, Observed = testing_data[, "mpg_code"])
+misclassification_table
+
+misclassification_rate <- (misclassification_table[1,2] + misclassification_table[2,1]) / sum(misclassification_table)
+misclassification_rate
+```
+
+This polynomial SMV gives us the misclassification rate of 7.62%.
+
+### Radials :
+
+For tuning the Radial SVMs, gamma is required. So providing a gamma value of 0.5,1,2,3 and 5.
+
+```{r}
+tune_radial_training <- tune(svm, mpg_code~., data = training_data, kernel = "radial", 
+                                 ranges = list(cost = c(0.001, 0.01, 0.1, 1, 10, 100, 1000),
+                                               gamma = c(0.5,1,2,3,5)
+                                 ))
+summary(tune_radial_training)
+```
+
+According to the summary, best radial SVM has the cost value of 1 and gamma of 1. This SVM has the lowest error value 0.07685185 and dispersion value 0.06142040.
+
+```{r}
+best_svm_radial_tr <- tune_radial_training$best.model ## it will give the best model
+summary(best_svm_radial_tr)
+```
+
+From the summary of the best model, Best Radial SVM has the cost of 1 and number of support vectors are 155 out of which 79 support vectors are of class 0 and 76 support vectors are of class 1.
+
+**Checking the Accuracy of the model :**
+
+```{r}
+pred3 <- predict(best_svm_radial_tr, newdata = testing_data)
+
+# now for misclassification rate, construct misclassification table
+misclassification_table <- table(pred3, Observed = testing_data[, "mpg_code"])
+misclassification_table
+
+misclassification_rate <- (misclassification_table[1,2] + misclassification_table[2,1]) / sum(misclassification_table)
+misclassification_rate
+```
+
+This Radial SVM gives us the misclassification rate of 4.23%.
+
+Misclassification rate for linear, polynomial and radial SVMs are 6.77%, 7.62% and 4.23% respectively.
+
+Out of these three, radial has the lowest misclassification rate. Therefore, we will choose radial SVM for this data set.

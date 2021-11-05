@@ -1,0 +1,203 @@
+---
+title: "Week4_Assignment"
+author: "Mohit Mehndiratta"
+date: "18/08/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+### (a) - Load and attach the “Default” dataset and view the first few rows. Investigate the structure/class of each variable using str() function.
+
+We will be loading the Default dataset directly from ISLR library.
+
+```{r}
+library(ISLR)
+attach(Default)
+head(Default)
+dim(Default)
+str(Default)
+```
+
+Here we can see that, there are a total of 10,000 observations of 4 variables. Out of which "default" and "student" are categorical/factor variables and "balance", "income" are numerical variables.
+
+Since, default is the categorical variable we can use it in our logistic regression model.
+
+### (b) - Fit a Logistic Regression Model for default in terms of balance and give the model.
+
+```{r}
+model1 <- glm(default~balance, data = Default, family = binomial)
+summary(model1)
+```
+
+The model1 above, is our logistic regression model for default in terms of balance. Upon looking at the summary we can see that value of the **intercept** is **-10.65** and the **slope** is **0.005499**. Therefore our equation for this model will be:
+
+$\hat{P(Y)}$ = $\frac{e^{\hat{\alpha} + \hat{\beta} X}}{1 + e^{\hat{\alpha} + \hat{\beta} X}}$
+
+After replacing the intercept and slope value w.r.t to default vs balance model:
+
+$\hat{P(default)}$ = $\frac{e^{\hat{-10.65} + \hat{0.005499} balance}}{1 + e^{\hat{-10.65} + \hat{0.005499} balance}}$
+
+
+This is the probability that a person with the balance X would be in default.
+
+### (c) - Give the probability that a person with balance 500 will be in default.
+
+So Given that,
+
+balance = 500, by replacing this in our model equation we can find out the probability.
+
+```{r}
+balance = 500
+t = -10.65 + (0.005499 * balance) # this is our exponential's superscript.
+# probability
+probabilityOfDefault = exp(t) / (1 + exp(t))
+probabilityOfDefault
+```
+
+From the output, we can see that **0.000370421** is the probability of a person with balance 500 to be in a default.
+
+
+### (d) - Fit a Logistic Regression Model for default in terms of all the three predictors.
+
+```{r}
+model2 <- glm(default~balance+student+income, data = Default, family = binomial)
+summary(model2)
+```
+
+## Question 2
+
+### (a) Import the “Heart” dataset and view the first few rows. Investigate the structure/class of each variable.
+
+```{r}
+heartDS <- read.csv("../datasets/heart.csv")
+attach(heartDS)
+head(heartDS)
+dim(heartDS)
+str(heartDS)
+```
+
+By looking at the output we can see that heart data set consists of 303 observations of 15 variables.
+
+We can see that our target variable "AHD" is the integer variable to we need to make it a factor variable because this a classification model.
+
+```{r}
+heartDS$AHD = as.factor(heartDS$AHD)
+str(heartDS)
+```
+
+So now we can see that AHD is a factor variable now.
+
+
+### (b) Fit a Logistic Regression Model for AHD in terms of Sex, ChestPain and Ca.
+
+```{r}
+model3 <- glm(AHD~Sex+ChestPain+Ca, data = heartDS, family = binomial)
+summary(model3)
+```
+
+
+## Question 3
+
+### (a) Load and attach the “Smarket” dataset and view the first few rows. Investigate the structure/class of each variable.
+
+```{r}
+attach(Smarket)
+head(Smarket)
+dim(Smarket)
+str(Smarket)
+```
+
+Here we can see that, there are a total of 1250 observations of 9 variables.
+
+Since, Direction is the categorical variable we can use it in our logistic regression model as a target variable.
+
+### (b) Fit a Logistic Regression Model for Direction in terms of the Predictors Lag1, Lag2, Lag3, Lag4, Lag5 and Volume. 
+
+```{r}
+model4 <- glm(Direction~Lag1+Lag2+Lag3+Lag4+Lag5+Volume, data = Smarket, family = binomial)
+summary(model4)
+```
+
+### (c) Explain how you would calculate the probability (the Direction = “up”) for a given set of X (predictor) values.
+
+So to find the probability for Direction "Up", we need to find out that if our model has dummy variable for the same. To do so, we can use contrasts function
+
+```{r}
+contrasts(Direction)
+```
+
+Here, we can confirm that R has a dummy variable with 1 for "Up".
+
+Now, we can check that coefficients of our model and create our model equation to find the probability of Direction "Up".
+
+```{r}
+coef(model4)
+```
+
+Now substituting the value of coefficients into our equation for the model,
+
+$\hat{P(Direction = Up)}$ = $\frac{e^{\hat{-0.126000257} - \hat{0.073073746} Lag1 - \hat{0.042301344} Lag2 + \hat{0.011085108} Lag3 + \hat{0.009358938} Lag4 + \hat{0.010313068} Lag5 + \hat{0.135440659} Volume }}{1 + e^{\hat{-0.126000257} - \hat{0.073073746} Lag1 - \hat{0.042301344} Lag2 + \hat{0.011085108} Lag3 + \hat{0.009358938} Lag4 + \hat{0.010313068} Lag5 + \hat{0.135440659} Volume }}$
+
+By using the above equation we can calculate the probability of Direction "Up".
+
+### (d) Construct the Misclassification Martrix
+
+for this we need to create a prediction class for the misclassification matrix first. For prediction class we first need to make predictions.
+
+```{r}
+predicted_prob <- predict(model4, type = "response")
+```
+
+From above we can see all the predictions of our model. Now we need to make a prediction class out of it for Up and Down. We will create a prediction class with the condition that if a probability is greater than 0.5 then we will take it as "Up".
+
+```{r}
+predicted_class <- rep("Down", nrow(Smarket))
+predicted_class[predicted_prob > 0.5] = "Up"
+
+table(predicted_class, Direction)
+```
+
+From the above table we can see that this is our misclassification matrix.
+
+### (e) Calculate the Prob(Misclassification) or Misclassification Rate
+
+Misclassification rate can be calculated as the number of items falsely predicted by our model prediction. From above table we can see that we falsely predicted **141** as **Down** and **457** as **Up**.
+
+Therefore, using this misclassification rate would be:
+
+```{r}
+misclassificationRate <- (141 + 457) / (145 + 141 + 457 + 507)
+misclassificationRate
+```
+
+From this we can find out that the misclassification rate is 47.84%.
+
+### (f) Calculate the False Positive rate
+
+From the misclassification matrix, false positive is 457. That is 457 items predicted as Up while in actual they were Down.
+
+Therefore, using this false positive rate would be:
+
+```{r}
+falsePositiveRate <- 457 / (145 + 457)
+falsePositiveRate
+```
+
+From above output, we can see that false positive rate is 75.91%
+
+### (g) Calculate the False Negative rate
+
+From the misclassification matrix, false negative is 141. That is 141 items predicted as Down while in actual they were Up
+
+Therefore, using this false negative rate would be:
+
+```{r}
+falseNegativeRate <- 141 / (141 + 507)
+falseNegativeRate
+```
+
+From above output, we can see that false negative rate is 21.75%

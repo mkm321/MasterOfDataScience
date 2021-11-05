@@ -1,0 +1,232 @@
+---
+title: "Week5_Assignment"
+author: "Mohit Mehndiratta"
+date: "28/08/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+### (a) Upload the Auto dataset and view first few rows.
+```{r}
+library(ISLR)
+attach(Auto)
+dim(Auto)
+head(Auto)
+str(Auto)
+```
+
+There are 392 observations of 9 variables. All variables are numeric except "Name". Name is a factor variable.
+
+### (b) Using validation-set approach, select the best model from the polynomial models of order 1, 2 and 3 to to explain mpg in terms of horsepower . (You may need to devide the dataset into two parts; one for training and the other for validation. Use the 3 models of order 1, 2 and 3 and select the model with minimum validation error) Use set.seed(2) to get reproducible results.
+
+```{r}
+set.seed(2)
+tr1 = sample(1:nrow(Auto), nrow(Auto) * 0.7)
+length(tr1)
+# splitting the training data
+auto_training_data = Auto[tr1,]
+# building models
+model1 <- lm(mpg~horsepower, data = Auto, subset = tr1)
+mse1 <- mean((mpg - predict(model1, Auto))[-tr1]^2)
+
+model2 <- lm(mpg~poly(horsepower, 2), data = Auto, subset = tr1)
+mse2 <- mean((mpg - predict(model2, Auto))[-tr1]^2)
+
+model3 <- lm(mpg~poly(horsepower, 3), data = Auto, subset = tr1)
+mse3 <- mean((mpg - predict(model3, Auto))[-tr1]^2)
+
+mse_seed2 <- c(mse1, mse2, mse3)
+order <- c(1,2,3)
+
+plot(order, mse_seed2, type="b", col = 2)
+```
+
+Here, we can see that Mean Square Estimate for order 2 has the lower error and it is less complex as compared to order 3. Therefore, Model 2 is our best model.
+
+### (c) Repeat part (b) with set.seed values as 5 and 8. Compare your results.
+
+```{r}
+## Now for seed 5
+set.seed(5)
+tr1 = sample(1:nrow(Auto), nrow(Auto) * 0.7)
+length(tr1)
+# splitting the training data
+auto_training_data = Auto[tr1,]
+# building models
+model1 <- lm(mpg~horsepower, data = Auto, subset = tr1)
+mse1 <- mean((mpg - predict(model1, Auto))[-tr1]^2)
+
+model2 <- lm(mpg~poly(horsepower, 2), data = Auto, subset = tr1)
+mse2 <- mean((mpg - predict(model2, Auto))[-tr1]^2)
+
+model3 <- lm(mpg~poly(horsepower, 3), data = Auto, subset = tr1)
+mse3 <- mean((mpg - predict(model3, Auto))[-tr1]^2)
+
+mse_seed5 <- c(mse1, mse2, mse3)
+
+
+## Now for seed 8
+set.seed(8)
+tr1 = sample(1:nrow(Auto), nrow(Auto) * 0.7)
+length(tr1)
+# splitting the training data
+auto_training_data = Auto[tr1,]
+# building models
+model1 <- lm(mpg~horsepower, data = Auto, subset = tr1)
+mse1 <- mean((mpg - predict(model1, Auto))[-tr1]^2)
+
+model2 <- lm(mpg~poly(horsepower, 2), data = Auto, subset = tr1)
+mse2 <- mean((mpg - predict(model2, Auto))[-tr1]^2)
+
+model3 <- lm(mpg~poly(horsepower, 3), data = Auto, subset = tr1)
+mse3 <- mean((mpg - predict(model3, Auto))[-tr1]^2)
+
+mse_seed8 <- c(mse1, mse2, mse3)
+
+
+order <- c(1,2,3)
+plot(order, mse_seed2, type="b", col = "red")
+lines(mse_seed5, type = "b", col = "blue")
+lines(mse_seed8, type = "b", col = "green")
+legend(2.3, 25, legend=c("Seed 2", "Seed 5", "Seed 8"),
+       col=c("red", "blue", "green"),lty = 1)
+```
+
+From the above graph, we can see that all the model has slightly different values with different seed values but has similar representation. Seed 2 gives the lowest error value for mpg vs horsepower at order 2.
+
+### (d) Give a drawback of using validation set approach to select the best model?
+
+The major drawback of using validation set approach is that when we use different training set/ split we gets different values of our MSE values.
+
+### (e) Using LOOCV method, select the best model from the polynomial models of order 1 to 10. (for mpg in terms of horsepower)
+
+```{r}
+### Using LOOCV
+library(boot)
+poly_order <- c(1:10)
+cv_error <- rep(0,10)
+for(i in poly_order){
+  m <- glm(mpg~poly(horsepower, i), data = Auto)
+  cv_error[i] <- cv.glm(Auto, m)$delta[1]
+}
+
+cv_error
+plot(poly_order, cv_error, type = "b", xlab = "Order of Polynomials", 
+     col = "red", ylab = "LOOCV Error")
+```
+
+From the above graph, we can observe that there is a significant drop of error for order 2 and for the rest of the order there are slight increase and decrease for the error.
+
+For order 7, the error is the lowest but there is no quite significant improvement in the error as compared to order 2.
+Therefore, we can use order 2 to make our model less complex and hence this is the best model.
+
+### (f) Use 10-fold cross-validation method for the same model in part (e).
+
+```{r}
+### Using K-Fold CV
+
+cv_error_K_fold <- rep(0,10)
+for(i in 1:10){
+  mod <- glm(mpg~poly(horsepower, i), data = Auto)
+  cv_error_K_fold[i] <- cv.glm(Auto, mod, K = 10)$delta[1]
+}
+cv_error_K_fold
+
+plot(poly_order, cv_error_K_fold, type = "b", xlab = "Order of Polynomials", 
+     col = "red", ylab = "10-Fold CV Error")
+```
+
+we can also see that there is a significant drop of error for order 2 and for the rest of the order there are slight increase and decrease for the error.
+
+There are lower error for order 5 and 7 as compared to order 2 but those are not much significant in numbers.
+
+Therefore, we can use order 2 to make our model less complex and hence this is the best model.
+
+## Question 2
+###  Consider linear models with all posible combinations of variables in the Advertising dataset to explain Sales variable.
+### Using 10-fold cross-validation select the best model. (use glm function)
+
+First uploading and viewing the data set.
+```{r}
+Advertising <- read.csv("../datasets/advertising.csv")
+dim(Advertising)
+attach(Advertising)
+str(Advertising)
+head(Advertising)
+```
+
+There are 200 observations of 4 variables. All variables are numeric.
+
+Now creating the models for all the combination of variables against Sales.
+
+```{r}
+model1 <- glm(Sales~TV, data = Advertising)
+model2 <- glm(Sales~Radio, data = Advertising)
+model3 <- glm(Sales~Newspaper, data = Advertising)
+model4 <- glm(Sales~TV+Radio, data = Advertising)
+model5 <- glm(Sales~TV+Newspaper, data = Advertising)
+model6 <- glm(Sales~Radio+Newspaper, data = Advertising)
+model7 <- glm(Sales~TV+Radio+Newspaper, data = Advertising)
+
+cv_error_Sales <- rep(0,7)
+cv_error_Sales[1] = cv.glm(Advertising, model1, K = 10)$delta[1]
+cv_error_Sales[2] = cv.glm(Advertising, model2, K = 10)$delta[1]
+cv_error_Sales[3] = cv.glm(Advertising, model3, K = 10)$delta[1]
+cv_error_Sales[4] = cv.glm(Advertising, model4, K = 10)$delta[1]
+cv_error_Sales[5] = cv.glm(Advertising, model5, K = 10)$delta[1]
+cv_error_Sales[6] = cv.glm(Advertising, model6, K = 10)$delta[1]
+cv_error_Sales[7] = cv.glm(Advertising, model7, K = 10)$delta[1]
+
+plot(1:7, cv_error_Sales, type = "b", xlab = "Order of Polynomials", 
+     col = "red", ylab = "10-Fold CV Error for Sales")
+```
+
+By looking at this graph, the best model is TV + Radio because it has lower error.
+TV + Radio + Newspaper has also the lowest error but it is not much significantly lower and is more complex than TV + Radio model.
+
+So, we will select the model 4, Sales vs TV + Radio as the best model.
+
+## Question 3
+
+### (a) Generate 20 random numbers using the following R code:
+### x = 10*rexp(20)
+
+```{r}
+set.seed(100)
+x = 10*rexp(20)
+```
+
+### (b) Calculate the mean of x.
+
+```{r}
+mean(x)
+```
+
+Mean for the above sample x is **7.762101**.
+
+### (c) Generate 1000 bootstrap samples using the above dataset and calculate the means.
+
+```{r}
+count_BS <- 1000
+mean_samples <- rep(0,count_BS)
+mean_samples[1] <- mean(x)
+
+for(i in 2:count_BS) {
+  mean_samples[i] <- mean(sample(x, replace = TRUE))
+}
+
+mean_samples
+```
+
+Here we received 1000 samples of means for the sample x.
+
+### (d) Draw the histogram of the means calculated in part (c).
+
+```{r}
+hist(mean_samples, main = "Mean of 1000 bootstrapped samples", xlab = "Mean samples")
+```
+

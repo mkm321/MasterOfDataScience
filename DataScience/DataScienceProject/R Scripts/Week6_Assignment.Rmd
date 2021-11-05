@@ -1,0 +1,293 @@
+---
+title: "Week6_Assignment"
+author: "Mohit Mehndiratta"
+date: "02/09/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+### Attach the “Carseats” dataset from ISLR library and explore.
+
+```{r}
+library(ISLR)
+library(tree)
+attach(Carseats)
+head(Carseats)
+dim(Carseats)
+str(Carseats)
+```
+
+There are 400 observations with 11 variables. There are 3 factor variables "ShelveLoc", "Urban", "US" and rest all are numeric variables.
+
+## Question 01: Regression Trees: Use “Carseats” dataset with Sales as the Target Variable
+
+### a) Divide the dataset into Training and Testing sets.
+
+```{r}
+set.seed(5)
+trainingIndexes <- sample(1:nrow(Carseats), nrow(Carseats)* 0.5)
+
+training_DS <- Carseats[trainingIndexes, ]
+dim(training_DS)
+
+testing_DS <- Carseats[-trainingIndexes,]
+dim(testing_DS)
+```
+
+We divided training and testing data set into equal halves of the original data set. Now both of the data set contains 200 Observations of 11 variables each.
+
+### b) Fit a Regression Tree for training data set.
+
+```{r}
+reg_tree <- tree(Sales~., data = Carseats, subset = trainingIndexes)
+summary(reg_tree)
+
+plot(reg_tree)
+text(reg_tree, pretty = 0)
+
+```
+
+In this regression tree, we can see that we used 6 variables to form this tree with 20 terminal nodes.
+
+For the accuracy of this model, we need to check mean squared errors and Root mean squared errors.
+
+```{r}
+yhat1 <- predict(reg_tree, newdata = testing_DS)
+
+MSE <- mean((yhat1 - testing_DS[, "Sales"])^2)
+MSE
+## now the root mean squared error is  : 
+
+RMSE1 <- sqrt(MSE)
+RMSE1
+```
+
+From this we can see that mean squared error and root mean squared error are **5.041825** and **2.245401** respectively.
+
+### c) Construct the Cross validation plot
+
+```{r}
+set.seed(6)
+cv_reg_tree <- cv.tree(reg_tree)
+cv_reg_tree
+
+plot(cv_reg_tree$size, cv_reg_tree$dev, type = "b", xlab = "Tree Size", 
+     ylab = "Sum of Squared Errors (SSE)")
+```
+
+From the plot, we can observe that how sum of squared errors are affecting according to the tree size. Clearly, we can say that the higher the tree size the lower the SSE for this data set.
+
+
+### d) Select the best size of the tree
+
+From the graph of cross validation plot, we can see that there is a continuous drop till the largest size. So we have to select fully grown tree as our best size of the tree.
+
+**Best size = 20 **
+
+### e) Obtain the best regression tree by pruning
+
+```{r}
+pruned_regtree <- prune.tree(reg_tree, best = 20)
+plot(pruned_regtree)
+text(pruned_regtree, pretty = 0)
+```
+
+Here we can see that it is similar to original because we used best size as fully grown tree itself.
+
+### f) Test the model accuracy.
+```{r}
+yhat_pruned <- predict(pruned_regtree, newdata = testing_DS)
+
+MSE_pruned <- mean((yhat_pruned - testing_DS[, "Sales"])^2)
+MSE_pruned
+## now the root mean squared error is  : 
+RMSE_pruned <- sqrt(MSE_pruned)
+RMSE_pruned
+```
+
+From this we can see that mean squared error and root mean squared error are **5.041825** and **2.245401** respectively, which is exactly same as our original regression tree.
+
+### g) Describe the terminal nodes of the resulting decision tree
+
+```{r}
+pruned_regtree
+```
+
+From this we can see that we have 20 terminal nodes(the nodes which are marked with * sign) and how we obtained those 20 terminal nodes and predicted the value of the Sales.
+
+So our tree representation is like,
+
+Terminal node 1:
+
+If ShelveLoc is either Bad or medium and if price is less than 105.5 and Age is less than 68.5 and CompPrice is less than 131 and Price is less than 92.5 then average sales predicted is 9.195.
+
+Terminal node 2:
+
+If ShelveLoc is either Bad or medium and if price is less than 105.5 and Age is less than 68.5 and CompPrice is less than 131 and Price is greater than 92.5 then average sales predicted is 6.888.
+
+Terminal node 3:
+
+If ShelveLoc is either Bad or medium and if price is less than 105.5 and Age is less than 68.5 and CompPrice is greater than 131 then average sales predicted is 11.120.
+
+Terminal node 4:
+
+If ShelveLoc is either Bad or medium and if price is less than 105.5 and Age is greater than 68.5 and if ShelveLoc is bad then average sales predicted is 4.375.
+
+Terminal node 5:
+
+If ShelveLoc is either Bad or medium and if price is less than 105.5 and Age is greater than 68.5 and if ShelveLoc is medium then average sales predicted is 7.154.
+
+and so on upto Terminal 20.
+
+## Question 02: Classification Trees: Use “Carseats” dataset with Sales as the Target Variable
+
+### a) Transfer Sales Variable from a Continuous variable to a Categorical Variable. Assign Assign Sales as “Yes” if Sales value is greater than 8 and “No” otherwise.
+
+```{r}
+hist(Sales)
+HighSales <- ifelse(Sales <= 8, "NO", "YES")
+head(HighSales)
+table(HighSales)
+# attaching the HighSales variable to the original data set.
+CarSeatsNew <- data.frame(Carseats, HighSales)
+# removing the Sales variable as we don't need it in classification now.
+CarSeatsNew <- CarSeatsNew[, -1]
+head(CarSeatsNew)
+str(CarSeatsNew)
+# Converting HighSales to form a factor variable for classification.
+CarSeatsNew$HighSales = as.factor(CarSeatsNew$HighSales)
+str(CarSeatsNew)
+```
+
+### b) Fit a Classification Tree for the full data set.
+```{r}
+class_tree_full <- tree(HighSales~., data = CarSeatsNew)
+summary(class_tree_full)
+plot(class_tree_full)
+text(class_tree_full,pretty = 0)
+```
+
+Here, we can see that there are 27 terminal nodes and misclassification rate for fully grown tree is 9% without split.
+
+### c) Test the model accuracy.
+
+misclassification rate that is  9%.
+To be more confident we divide the data into training and testing data set.
+If misclassification rate is as low as this in testing data set then we can say this is good model
+
+### d) Divide the dataset into Training and Testing sets and fit a Classification Tree for training dataset.
+```{r}
+set.seed(5)
+tr <- sample(1:nrow(CarSeatsNew), nrow(CarSeatsNew) * 0.5)
+
+CarSeats_Training <- CarSeatsNew[tr, ]
+dim(CarSeats_Training)
+CarSeats_Testing <- CarSeatsNew[-tr, ]
+dim(CarSeats_Testing)
+
+# Classigication tree for training DS
+class_tree_training <- tree(HighSales~., data = CarSeats_Training)
+summary(class_tree_training)
+plot(class_tree_training)
+text(class_tree_training, pretty = 0)
+```
+
+Here, we can see that with the 50% of the data, terminal nodes came down to 18 and misclassification rate is 12.5%.
+
+### e) Test the model accuracy.
+
+```{r}
+pred_class_test1 <- predict(class_tree_training, newdata = CarSeats_Testing, type = "class")
+head(pred_class_test1)
+
+observed_test <- CarSeats_Testing[, "HighSales"]
+
+misclassification_matrix <- table(pred_class_test1, observed_test)
+misclassification_matrix
+
+misclassrate <- ( misclassification_matrix[1,2] + misclassification_matrix[2,1] )/ sum(misclassification_matrix)
+
+misclassrate
+```
+
+Here, we can see that misclassification rate increased to 34%, for our training data set tree with 18 terminal nodes.
+
+### f) Construct the Cross validation plot.
+
+```{r}
+set.seed(1)
+cv_classtree <- cv.tree(class_tree_training, FUN = prune.misclass) ## we give this function for classification problem,
+# else we set K value
+cv_classtree
+plot(cv_classtree$size, cv_classtree$dev, type = "b", xlab = "Tree Size", 
+     ylab = "Number of Misclassifications")
+```
+
+From here, we can see that the deviance(number of misclassification) are lower for tree size 6.
+
+### g) Select the best size of the tree model.
+
+From 66 we can see 53 is less. so when tree size is 6 prune tree produces better results in cross validation
+so we will go with pruned tree => best = 6
+
+### h) Obtain the best classification tree by pruning.
+
+```{r}
+pruned_classtree <- prune.misclass(class_tree_training, best = 6)
+plot(pruned_classtree)
+text(pruned_classtree, pretty = 0)
+```
+
+### i) Test the model accuracy.
+
+```{r}
+pred_class_test2 <- predict(pruned_classtree, newdata = CarSeats_Testing, type = "class")
+head(pred_class_test2)
+
+observed_test <- CarSeats_Testing[, "HighSales"]
+
+misclassification_matrix_pruned <- table(pred_class_test2, observed_test)
+misclassification_matrix_pruned
+
+misclassrate <- ( misclassification_matrix_pruned[1,2] + misclassification_matrix_pruned[2,1] )/ sum(misclassification_matrix_pruned)
+
+misclassrate
+```
+
+Here, we can observe that with pruning misclassification rate goes down to 29.5% with 6 terminal nodes.
+
+### j) Describe the terminal nodes of the resulting decision tree.
+
+```{r}
+pruned_classtree
+```
+
+From this we can see that we have 6 terminal nodes(the nodes which are marked with * sign) and how we obtained those 6 terminal nodes and predicted the value of the Sales variable.
+
+So our tree representation is like,
+
+Terminal node 1:
+
+If ShelveLoc is Bad or Medium and if income is less than 60.5 then there are no high sales.
+
+Terminal node 2:
+
+If ShelveLoc is Bad or Medium and if income is greater than 60.5 and price is less than 92 then there are high sales.
+
+Terminal node 3:
+
+If ShelveLoc is Bad or Medium and if income is greater than 60.5 and price is greater than 92 and CompPrice is less than 134.5 then there are no high sales.
+
+Terminal node 4:
+
+If ShelveLoc is Bad or Medium and if income is greater than 60.5 and price is greater than 92 and CompPrice is greater than 134.5 and Advertisings are less than 10 then there are no high sales.
+
+Terminal node 5:
+
+If ShelveLoc is Bad or Medium and if income is greater than 60.5 and price is greater than 92 and CompPrice is greater than 134.5 and Advertisings are greater than 10 then there are high sales.
+
+Terminal node 6:
+
+If ShelveLoc is Good, then there are high sales.

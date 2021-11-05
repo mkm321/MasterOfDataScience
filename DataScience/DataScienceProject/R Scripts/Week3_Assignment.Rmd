@@ -1,0 +1,349 @@
+---
+title: "Week3 Assignment"
+author: "Mohit Mehndiratta"
+date: "11/08/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Question 1
+
+### Part(a) - Upload the Advertising data set and explore it.
+
+```{r}
+AdvertisingDS <- read.csv("../datasets/advertising.csv")
+attach(AdvertisingDS)
+head(AdvertisingDS)
+dim(AdvertisingDS)
+sapply(AdvertisingDS, class)
+```
+
+From the above output, we can see that Advertising data set has 200 observations of 4 variables. All the variables are numeric.
+
+### Part(b) - Find the Covariance and Correlation Matrix of Sales, TV, Radio and Newspaper.
+
+```{r}
+pairs(AdvertisingDS, panel = panel.smooth)
+cor(AdvertisingDS)
+cov(AdvertisingDS)
+```
+
+By Looking at the plot for Sales vs TV, we can see that there is a **strong positive linear relationship** between them and the correlation matrix table we can see that the value is **0.7822244** which confirms the same. 
+
+For Sales vs Radio, there exists a **moderate positive linear relationship** as the correlation between them is **0.5762226**.
+
+For Sales vs Newspaper, we can see that the line in the graph is not so linear thus depicting a **week linear relationship** and from the correlation matrix table we can see that the value is **0.2282990** which is very far away from 1 thus depicting a **week linear relationship**.
+
+### Part(c) - Construct the multiple linear regression model and find the least square estimates of the model parameters.
+
+Multiple linear regression includes building a model of multiple variable with respect to our target variable. Here Sales is our target variable and we can first start with including all the numeric variables into our model.
+
+```{r}
+model1 <- lm(Sales~TV+Radio+Newspaper)
+summary(model1)
+```
+
+By looking at the summary for the above model, we can see that the least square estimates of our model are as follows:
+
+1. $\hat{\beta _{0}}$ = 2.938889
+2. $\hat{\beta _{1}}$ = 0.045765
+3. $\hat{\beta _{2}}$ = 0.188530
+4. $\hat{\beta _{3}}$ = -0.001037
+
+Now, substituting the value of these estimates in our equation:
+
+$\hat{Sales}$ = 2.938889  + 0.045765 TV + 0.188530 Radio - 0.001037 Newspaper
+
+### Part(d) - Test the significance of the parameters and find the resulting model to model Sales in terms of advertising modes, TV, Radio and Newspaper
+
+To test the significance of the parameters of our model, we will use Hypothesis testing, H$_{0}$: $\beta _{i}$ = 0 and H$_{1}$: $\beta _{i}$ $\neq$ 0.
+
+From the summary of our model, we can see that p-value of TV is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of TV is also less than 0.01 thus depicting a **strong linear relationship**. Therefore, we can reject the null hypothesis H$_{0}$ at 1% level of significance as well.
+
+For Radio, we can see that p-value of Radio is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of Radio is also less than 0.01 thus depicting a **strong linear relationship**. Therefore, we can reject the null hypothesis H$_{0}$ at 1% level of significance as well.
+
+However, for Newspaper we can see that p-value of Newspaper is 0.86 which is not less than 0.05.This shows that there is a **week linear relationship**. Therefore, we can not reject the null hypothesis H$_{0}$ here, we have to reject the alternate hypothesis H$_{1}$ here.
+
+Now, after removing Newspaper our resultant model becomes: 
+
+```{r}
+model2 <- lm(Sales~TV+Radio)
+summary(model2)
+```
+
+Now, by looking at the summary of our new model, we can see that through hypothesis testing, TV and Radio show **strong linear relationship**. Hence our model equation becomes:
+
+$\hat{Sales}$ = 2.92110  + 0.04575 TV + 0.18799 Radio
+
+
+### Part(e) - Assess the overall accuracy of the model.
+
+After looking at the summary of our new model, we can see that Residual standard error is 1.681. We can check the Sales summary and then we can compare the error.
+
+```{r}
+summary(Sales)
+```
+
+So, for the summary we can observe that the Residual standard error or standard deviation seems to be low as compared to the median of Sales, which is good.
+
+Alternatively we can also check $R^{2}$ value from the summary which is 89.72%. That means 89.72% proportion is explained by the model.
+
+And at the end, if we look at the p-value, it is very small, which is good.
+
+### Part(f) - Calculate the predicted vales and residuals
+
+Below are the predicted values for our model.
+
+```{r}
+pred_values <- predict(model2)
+pred_values
+```
+
+Below are the residuals values for our model.
+
+```{r}
+resid_value <- resid(model2)
+resid_value
+```
+
+### Part(g) - Plot the residuals against the predicted values
+
+```{r}
+plot(pred_values, resid_value, xlab="Predicted Values", ylab="Residual Values")
+```
+
+### Part(h) - Plot the histogram of the residuals
+
+```{r}
+hist(resid_value, xlab = "Residuals", main="Histogram of Residuals")
+```
+
+Here, we can see that the residual values are not normally distributed and are negatively skewed. 
+
+### Part(i) - Comment on the residual plots
+
+```{r}
+par(mfrow=c(2,2))
+plot(model2)
+```
+
+From the above 4 plots, we can see that plot for Residuals vs Fitted are forming a pattern and are not scattered thus violating our **Linearity Assumption**.
+
+In second plot, we can see that the points are not accurately lying over the straight line, this violates our **Normality Assumption**.
+
+In Third plot, we can see that the spread of the plot is not constant throughout. This violates our **Heteroscedasticity Assumption**.
+
+### Part(j) - Use the multivariate model for prediction
+
+```{r}
+predict(model2, as.data.frame(cbind(TV = 400, Radio = 60)))
+```
+
+We can see that, the model predicted a sale of 32.50268.
+
+
+## Question 2
+
+### Part(a) - Add the Interaction Term TV*Radio and test the significance of the interaction term
+
+```{r}
+model3 <- lm(Sales~TV+Radio+TV*Radio)
+summary(model3)
+```
+
+By adding the interactive term TV*Radio, we can see that $R^{2}$ becomes 96.78%, that means 96.78% proportion is explained by model. 
+
+By doing Hypothesis testing for the interaction term, we can see that it is highly significant at 5% and 1% level of significance. Therefore we can reject the null hypothesis H$_{0}$. And this shows us that the new interaction term shows **strong positive linear relationship**.
+
+### Part(b) - Give the resulting model after considering this interaction term.
+
+Now, after considering the interaction term, the resultant model now become - 
+
+$\hat{Sales}$ = 6.750  + 0.001910 TV + 0.00288 Radio - 0.001086 TV * Radio
+
+
+### Part(c) - Construct the Polynomial Regression Model of order 3 and test the model significance.
+
+So, to consider a term for polynomial regression, we can check the correlation matrix of the data set. By looking at the correlation matrix we can see that TV has the highest correlation and thus most **significant** with respect to Sales. Therefore, after considering this our new model becomes: 
+
+```{r}
+model4 <- lm(Sales~TV+I(TV*TV)+I(TV*TV*TV))
+summary(model4)
+```
+
+Now, for significance we can do hypothesis testing here. And by seeing at summary we can clearly state that p-value for $TV^{2}$ and $TV^{3}$ are 0.120559 and 0.216519 respectively, which is greater than 0.05. So from this we have to reject our alternate hypothesis H$_{1}$ at 5% level of significance. Therefore, we can say that this polynomial model of order 3 is **not significant**.
+
+
+### Part(d) - Give the resulting selected model
+
+So, if we check the value of $R^{2}$ for all of the 4 models, these are:
+
+1. $R^{2}$ - 89.72%
+2. $R^{2}$ - 89.72%
+3. $R^{2}$ - 96.78%
+4. $R^{2}$ - 62.2%
+
+Therefore, from above data we can conclude that model 3 is the best model out of these. Thus, the resulting selected model is: 
+
+$\hat{Sales}$ = 6.750  + 0.001910 TV + 0.00288 Radio - 0.001086 TV * Radio
+
+
+
+## Question 3
+
+### Part(a) - Upload the Advertising data set and explore it.
+
+```{r}
+AutoDS <- read.csv("../datasets/auto.csv")
+attach(AutoDS)
+head(AutoDS)
+dim(AutoDS)
+sapply(AutoDS, class)
+```
+
+From the above output, we can see that Advertising data set has 397 observations of 9 variables, out of which some are numeric, integers and characters.
+
+As we only need numeric variables at this point, therefore taking out the subset of only numeric variabes. 
+
+```{r}
+AutoDS <- subset(AutoDS, select = c(mpg, cylinders, displacement, weight, acceleration, year, origin))
+head(AutoDS)
+```
+
+### Part(b) - Find the Covariance and Correlation Matrix of the variables.
+
+```{r}
+pairs(AutoDS, panel = panel.smooth)
+cor(AutoDS)
+cov(AutoDS)
+```
+
+By Looking at the plot for mpg vs cylinders, we can see that there is a **strong negative linear relationship** between them and the correlation matrix table we can see that the value is **-0.7762599** which confirms the same. 
+
+By Looking at the plot for mpg vs displacement, we can see that there is a **strong negative linear relationship** between them and the correlation matrix table we can see that the value is **-0.8044430** which confirms the same. 
+
+By Looking at the plot for mpg vs weight, we can see that there is a **strong negative linear relationship** between them and the correlation matrix table we can see that the value is **-0.8317389** which confirms the same. 
+
+For mpg vs acceleration, there exists a **moderate positive linear relationship** as the correlation between them is **0.4222974**.
+
+For mpg vs year, there exists a **moderate positive linear relationship** as the correlation between them is **0.5814695**.
+
+For mpg vs origin, there exists a **moderate positive linear relationship** as the correlation between them is **0.5636979**.
+
+### Part(c) - Construct the multiple linear regression model and find the least square estimates of the model parameters.
+
+Multiple linear regression includes building a model of multiple variable with respect to our target variable. Here mpg is our target variable and we can first start with including all the numeric variables into our model.
+
+```{r}
+model1 <- lm(mpg~cylinders+displacement+weight+acceleration+year+origin)
+summary(model1)
+```
+
+By looking at the summary for the above model, we can see that the least square estimates of our model are as follows:
+
+1. $\hat{\beta _{0}}$ = -0.2014
+2. $\hat{\beta _{1}}$ = -0.4198
+3. $\hat{\beta _{2}}$ = 0.001742
+4. $\hat{\beta _{3}}$ = -0.0006928
+5. $\hat{\beta _{4}}$ = 0.01591
+6. $\hat{\beta _{5}}$ = 0.07703
+7. $\hat{\beta _{6}}$ = 1.356
+
+Now, substituting the value of these estimates in our equation:
+
+$\hat{mpg}$ = - 0.2014  - 0.4198 cylinders + 0.001742 displacement - 0.0006928 weight + 0.062462 acceleration + 0.07703 year + 1.356 origin
+
+### Part(d) - Test the significance of the parameters and find the resulting model to model mpg in terms of advertising modes, displacement and acceleration.
+
+To test the significance of the parameters of our model, we will use Hypothesis testing, H$_{0}$: $\beta _{i}$ = 0 and H$_{1}$: $\beta _{i}$ $\neq$ 0.
+
+For cylinders we can see that p-value of acceleration is 0.1908 which is not less than 0.05.This shows that there is a **week linear relationship**. Therefore, we can not reject the null hypothesis H$_{0}$ here, we have to reject the alternate hypothesis H$_{1}$ here.
+
+From the summary of our model, we can see that p-value of displacement is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of displacement is not less than 0.01 thus depicting a **moderate strong linear relationship**.
+
+From the summary of our model, we can see that p-value of weight is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of weight is also less than 0.01 thus depicting a **strong linear relationship**. Therefore, we can reject the null hypothesis H$_{0}$ at 1% level of significance as well.
+
+From the summary of our model, we can see that p-value of acceleration is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of acceleration is not less than 0.01 thus depicting a **moderate strong linear relationship**.
+
+From the summary of our model, we can see that p-value of year is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of year is also less than 0.01 thus depicting a **strong linear relationship**. Therefore, we can reject the null hypothesis H$_{0}$ at 1% level of significance as well.
+
+From the summary of our model, we can see that p-value of origin is less than 0.05. Therefore, we get enough evidence to reject the null hypothesis H$_{0}$ at 5% significance level. Moreover, we can also see that p-value of origin is also less than 0.01 thus depicting a **strong linear relationship**. Therefore, we can reject the null hypothesis H$_{0}$ at 1% level of significance as well.
+
+Now, after removing week relationship our resultant model becomes: 
+
+```{r}
+model2 <- lm(mpg~displacement+weight+acceleration+year+origin)
+summary(model2)
+```
+
+Now, by looking at the summary of our new model, we can see that through hypothesis testing, there are some mix of moderate and strong relationship.
+
+$\hat{mpg}$ = -0.2099 + 0.001115 displacement - 0.0006984 weight + 0.01551 acceleration + 0.07697 year + 1.330 origin.
+
+### Part(e) - Assess the overall accuracy of the model.
+
+After looking at the summary of our new model, we can see that Residual standard error is 3.351 We can check the mpg summary and then we can compare the error.
+
+```{r}
+summary(mpg)
+```
+
+So, for the summary we can observe that the Residual standard error or standard deviation seems to be low as compared to the median of mpg, which is good.
+
+Alternatively we can also check $R^{2}$ value from the summary which is 81.8%. That means 81.8% proportion is explained by the model.
+
+And at the end, if we look at the p-value, it is very small, which is good.
+
+### Part(f) - Calculate the predicted vales and residuals
+
+Below are the predicted values for our model.
+
+```{r}
+pred_values <- predict(model2)
+pred_values
+```
+
+Below are the residuals values for our model.
+
+```{r}
+resid_value <- resid(model2)
+resid_value
+```
+
+### Part(g) - Plot the residuals against the predicted values
+
+```{r}
+plot(pred_values, resid_value, xlab="Predicted Values", ylab="Residual Values")
+```
+
+### Part(h) - Plot the histogram of the residuals
+
+```{r}
+hist(resid_value, xlab = "Residuals", main="Histogram of Residuals")
+```
+
+Here, we can see that the residual values looks normally distributed and have mean around 0.
+
+### Part(i) - Comment on the residual plots
+
+```{r}
+par(mfrow=c(2,2))
+plot(model2)
+```
+
+From the above 4 plots, we can see that plot for Residuals vs Fitted are forming a pattern and are not scattered thus violating our **Linearity Assumption**.
+
+In second plot, we can see that the points are not accurately lying over the straight line, this violates our **Normality Assumption**.
+
+In Third plot, we can see that the spread of the plot is somewhat constant throughout. Therefore we can say that this doesn't violates our **Heteroscedasticity Assumption**.
+
+### Part(j) - Use the multivariate model for prediction
+
+```{r}
+predict(model2, as.data.frame(cbind(displacement = 500, weight = 1500, acceleration = 26, year = 85, origin = 3)))
+```
+
+We can see that, the model predicted mpg of 47.64788.

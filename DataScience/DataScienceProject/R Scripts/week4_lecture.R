@@ -1,0 +1,5 @@
+library(ISLR)
+attach(Default)
+dim(Default)
+head(Default)
+plot(income~default, balance~default, col=c(1,2))
