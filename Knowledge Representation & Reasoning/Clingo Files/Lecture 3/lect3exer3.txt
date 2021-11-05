@@ -1,0 +1,32 @@
+Given a KB consisting of the following rules:
+    Steamboat(x) ∧ Sailboat(y) ⇒ Faster(x, y) 
+    Sailboat(x) ∧ Rowboat(y) ⇒ Faster(x, y) 
+    Faster (x , y ) ∧ Faster (y , z ) ⇒ Faster (x , z ) 
+    Steamboat(Titanic)
+    Sailboat(Mistral) 
+    Rowboat(PondArrow)
+
+Using backward chaining to prove: Faster (Titanic , PondArrow ).
+
+Basically we want to proove, Steamboat(x) ∧ Rowboat(y) => Faster(x,y)
+
+So we want 
+                Faster(x,y)
+                    |
+                Faster(Titanic, PondArrow)
+                |                       |
+        Steamboat(Titanic)          Sailboat(PondArrow)
+
+we have Steamboat(Titanic) but not Sailboat(PondArrow) in our facts, so discarding this.
+
+Similarly discarding second rule for this.
+
+                Faster(x,y)
+                    |
+                Faster(Titanic, PondArrow)
+                |                       |
+        Faster(Titanic, Z)         Faster(Z, PondArrow)
+        |               |               |               |
+Steamboat(Titanic)  Sailboat(Mistral)   Sailboat(Z)    Rowboat(PondArrow)
+                        |               |
+                        {Z/Mistral}    Sailboat(Mistral)

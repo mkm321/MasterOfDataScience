@@ -1,0 +1,7 @@
+values <- scan(n = 5)
+standardDeviation <- sd(values)
+meanValues <- mean(values)
+cat("Standard Deviation is", standardDeviation)
+cat("Mean is", meanValues)
+hist(standardDeviation)
+hist(meanValues)

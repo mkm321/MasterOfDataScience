@@ -1,0 +1,9 @@
+2. Write the following assertions in first-order logic formulas: 
+(a) Peter is either a teacher or a tutor.
+(b) Every PhD student has a supervisor.
+
+(a) :
+(teacher(peter) V tutor(peter))
+(teacher(peter) | tutor(peter))
+(b) :
+∀xs phd_student(x) => supervisor(s,x)

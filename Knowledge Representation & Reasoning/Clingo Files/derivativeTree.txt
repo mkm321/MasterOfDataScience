@@ -1,0 +1,12 @@
+            ancestor(alice, eric)
+            |                   |
+        |                           |
+    parent(alice, Z)                    ancestor(Z, eric)
+    |                                   |                        
+    parent(alice, bob)                  ancestor(bob, eric) 
+    {Z/bob}                                    |               |
+                                        parent(bob, Z)  ancestor(Z, eric)
+                                        |                               |
+                                        parent(bob, dean)               parent(Z, eric)
+                                        {Z/dean}                                |
+                                                                        parent(dean, eric)

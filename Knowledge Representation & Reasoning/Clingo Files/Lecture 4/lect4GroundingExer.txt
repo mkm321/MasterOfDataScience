@@ -1,0 +1,20 @@
+Consider an ASP program Π containing the following rules:
+p(X) ← not q(X). 
+q(X) ← not p(X). 
+t (a).
+t(b).
+(a) What is the grounding of Π?
+(b) Find all answer sets of Π
+
+(a) : Grouding of Π is : 
+    p(a) <- not q(a).
+    p(b) <- not q(b).
+    q(a) <- not p(a).
+    q(b) <- not p(b).
+    t(a).
+    t(b).
+(b) Answer set are :- 
+    S = {t(a), t(b), p(a), p(b)}
+    S = {t(a), t(b), p(a), q(b)}
+    S = {t(a), t(b), q(a), q(b)}
+    S = {t(a), t(b), q(a), p(b)}

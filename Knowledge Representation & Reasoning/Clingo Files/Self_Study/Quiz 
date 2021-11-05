@@ -1,0 +1,18 @@
+fly(X) :- bird(X), not ab(default_1(X)), not ab(default_2(X)).
+fly(X) :- moving_object(X), not -fly(X).
+-fly(X):- moving_object(X).
+-fly(X) :- broken_wing(X).
+ab(default_1(X)) :- bird(X), broken_wing(X).
+ab(default_2(X)) :- emu(X).
+moving_object(toyota).
+having_wheels(toyota).
+moving_object(qantas).
+bird(tweety).
+bird(kiwi).
+bird(sunny).
+broken_wing(kiwi).
+bird(buddy).
+emu(buddy).
+#show fly/1.
+#show -fly/1.
+

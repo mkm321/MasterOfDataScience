@@ -1,0 +1,21 @@
+---
+title: "Untitled"
+author: "Mohit Mehndiratta"
+date: "9/10/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+List of things to do:
+
+1. Become proficient in R.
+   - Attend a lot of classes.
+   - Ask lots of questions.
+2. Don't forget to add +2 to dice rolls.
+3. Teach friends R.
+
+
+$$\sum_{x = 1}^{n} x = (n + 1)n/2$$

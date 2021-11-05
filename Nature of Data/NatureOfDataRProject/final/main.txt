@@ -1,0 +1,43 @@
+--------------------------------------------------
+------------ More than 2 categories --------------
+Question - Does the distribution of refugees distress differ from that of 
+           Australian population?
+Solution - In this we are interested in numbers
+
+Data set: Counts in series of categories.
+    1. 4 categories with values
+    2. 4 categories with percentages
+
+             Low     moderate   high   very high
+    IRAQI    123       70       93       157
+    AIHW(%)  70.65     18.5     7.41     3.43
+Question: 
+    Iraqi - Comparing categorical counts with proportions, 
+    eyes, eels - Comparing two set of counts.
+    Assignment 1 ques 3 - Comparing two set of proportions.
+Plot type - Barplots
+Statistic used - chi-square distance. sum((O - E)^2/E)
+
+------------------------------------------------------------
+------------ Numerical data for 2 categories ---------------
+Question - Does smoking affectd the birth weights of infants
+Name - Birth Weight, Card Piles, Drugs data, Spider, Sales vs office
+Data set: Counts for 2 categories.
+    1. birth weights data
+    2. smoke data depicting the one smokes in yes or no
+Plot Type - Boxplots
+Statistic used - difference in mean
+
+-----------------------------------------------------------------------
+------------ 2 Numerical Data | Correlation or Linearity --------------
+For linear models, there are two things. one is for slope = 0 and 
+other one is for slope = 1 and another one is finding confidence interval
+
+Question - if there is some Correlation between two numeric variables
+         - if there is any relationship between two numeric variables
+         - if one variable changing with respect to other variable?
+Name - Crabs Data, Time vs Force, height vs earn, pulse, helmets
+Plot Type - Scatterplots
+Statistic - cor, lm
+
+For 

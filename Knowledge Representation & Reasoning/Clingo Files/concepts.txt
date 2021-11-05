@@ -1,0 +1,502 @@
+Lecture 1
+------------------------------------------------------------------------------------------
+    Pi denotes program
+    Program can be divided into two parts : 
+    1. Facts
+    2. Rules - Knowledge
+
+    Examples of Facts : 
+    mother(alice, sam) - alice is a mother of sam is a fact.
+    father(bob, sam) - bob is father of sam is a fact.
+
+    Examples of rules:
+    parent(X,Y) :- mother(X,Y)
+    parent(X,Y) :- father(X,Y)
+
+    This means if X is mother of Y then X is also a parent of Y.
+    
+    ASP is a kind of non-monotnic reasoning
+    In clingo, small letters represents objects and large letters represents variables.
+    X,Y -> these are variables
+    sam, alice, bob -> these are objects
+
+Lecture 2
+------------------------------------------------------------------------------------------
+    -> Answer set is a declarative language approach to AI.
+    Defeasibe reasoning definition - A reasoning process is defeasible when the corresponding argument
+    is rationally compelling but not deductively valid.
+
+    Example := normally, birds can fly.
+
+    A Signature consists of the building blocks of ASP, i.e. Objects, Variables, functions, predicates.
+
+    objects - objects are the constants, such as "sam", "alice", "bob", "tweety". Objects are lower
+    case inside ASP.
+    functions - functions are "not", "+", "negation -".
+    predicates - predicates are the relation, example "fly", "parent","bird","emu".
+    variables - variables are X, Y, and is upper case inside ASP.
+    Arity - is number of variables used in a predicate. in parent(X,Y) arity is 2.
+    Signatures - consists of E = {O,F,P,V}
+
+    Terms - Variables and objects constants are terms. 
+    Ground Terms - containing no symbol of arithmatic functions and no variables.
+        Joh, sam, alice are ground terms.
+        X and Y are terms that are variables
+        father(X,Y) is not a term
+
+    if a program is consists of natural number : 
+    "2 + 3", "5" are terms
+    "5" is a ground term while "2 + 3" is not.
+
+    ex - 
+    x < y :- y = x + 1, what are the predicates and functions?
+
+    if we write it as <(x,y) :- =(y, +(x,1)) , then we can see that
+        : predicates: <, =
+        : function: +
+
+    Atoms - atoms consists of parity with some variables(terms) , ex parent(X,Y) is an atom.
+    Literals - is an atom which is a negation of an atom. i.e. - parent(X,Y) is a literal.
+
+    Grounding of Program - 
+
+    The set of ground instantiations of rules of program is called grounding of program.
+    Example:
+    p(a).
+    q(b).
+    p(X) :- q(X).
+
+    then grounding is : 
+    p(a) :- q(a).
+    p(b) :- p(b).
+
+    Derviation tree : It represents the derivation process of a logic program.
+    derivation tree would not work if a logic program containing rules with default negation not.
+
+Lecture 3
+------------------------------------------------------------------------------------------
+    Propositional Logic : 
+
+    Syntax :- the syntax defines the legal sentences of Propositional logic.
+    sentences in PL are defined by Backus-Naur form.
+
+    ::= is defines.
+    => is implies
+    <=> is equivilaent
+    Operator precedence - -(negation), ^(AND), V(OR), =>, <=>
+
+    Inference Rules : Inference rules can be applied in Propositional Logic to derive a proof 
+    - a chain of conclusions that leads to the desired goal.
+
+    Some of the Inference Rules are : 
+
+    1. Modus Pones -> ((a => b, a ) / b )
+    this means if a implies b, and we know a then we can derive b.
+
+    2. And Elimination -> (a ^ b / a)
+    this means if a AND b then we can derive a
+
+    3. AND introduction -> (a , b / (a ^(AND) b))
+    this means if a is student and b is student then we can say that a and b are students.
+
+    4. OR introduction -> a / (a V(OR) b)
+    this means that if a is sunday and we know that then we can say that today is sunday
+    and todat is raining.
+
+    Knowledge Base, KB is a collection of Propositional formulas (sentences).
+
+
+    Syntax :- KB |- a, means a is derived from KB
+    Semantic :- KB |= a, means a is entailed from KB
+
+    Entailed means, if every interpretation that makes all the formulas of KB true also makes a true.
+
+    First Order Logic :
+        - Syntax
+        - Semantics
+        - Inference
+
+    Quantifier are:
+        ∀ - means for all
+        ∃ - means exists.
+
+    Forward Chaining : 
+        P1(X) ∧ · · · ∧ Pn(X) ⇒ Q(X).
+        Forward chaining is called fast reasoning method.
+        Forward chaining is a bottom up approach.
+        That means, we start from bottom facts, then we build up our derivation tree  and then we proove
+        which is the criminal.
+        Issue is, for just one thing we need to list down the fact of entire database.
+
+    Backward Chaining :
+        In this, we follow top-down approach.
+        Issue is, infinte loops
+
+    Logic Programming is closely related to backward chaining.
+    in Logic programming do everything as per backward chaining but consider all scenarios and
+    based on them choose the rule to apply.
+
+Lecture 4.
+------------------------------------------------------------------------------------------
+
+    ASP Semantics : 
+        In ASP, a program’s semantics is provided by the set of ground literals.
+
+    There are 3 parts of ASP Rule:
+    Head  <- Positive_body, Negative_body
+
+    Grounding vs Ground Literals of a program : 
+
+        Program :
+        p(X) :- q(X).
+        q(a).
+        a(b).
+
+    Grounding -
+    Grounding means replace variables with objects, : so for this grounding will be:
+        p(a) :- q(a).
+        p(b) :- q(b).
+        q(a).
+        q(b).
+
+
+    And Ground Literals are : 
+        p(a), -p(a), p(b), -p(b)
+        q(a), -q(a), q(b), -q(b)
+        
+    A set S of ground literals satisfies:
+        1. l if l ∈ S;
+        2. not l if l ∕∈ S;
+        3. l0 or ···or li if for some 0 ≤ j ≤ i, lj ∈ S ;
+        4. a set {li+1,··· ,lm,not lm+1,··· ,not ln} 
+            if S satisfies each lh andeachnotlk where(i+1)≤h≤mand(m+1)≤k≤n;
+        5. r if whenever S satisfies r’s body, it satisfies r’s head.
+
+    (exercise of this satisfaction examples are at video lect 4 time 1:05)
+
+    Informal Semantics :
+    We define a set S of ground literals by the following principles:
+        1. Each rule of Π is satisfied in S, that is, 
+            the head of the rule is believed if the corresponding body is believed;
+        2. Do not believe in contradictions;
+        3. Adhere to a “rationality principle” - do not believe anything
+            unless there is an explicit evidence to support it;
+        4. S is minimal in some sense.
+
+    Example :
+    1. ¬p(b) ← ¬q(a).
+        ¬q(a). belives negation q(a)
+        As per the above definition, answer set will be
+        S = {-q(a), -q(b)}
+
+        2. p(a) or p(b). “Believe p(a) or believe p(b).”
+            Answer:  
+            S1 = {p(a)} S2 = {p(b)}  "Two Answer sets"
+
+        3. p(a) or p(b)
+            ← p(a).
+            Answer set is: 
+            S = {p(b)}.
+
+            we have empty head here in line 2.
+            “It is impossible to believe p(a).”
+            This program has a unique answer set A = {p(b)}. because it has a constraint. 
+            
+    Default Negation - 
+        p(a) :- not q(a)
+
+        it says if you don't have any information about q(a) then belive p(a).
+
+
+
+    Note: A constraint limits the sets of beliefs an agent can have, 
+        but does not serve to derive any new information.
+
+    Exercise : 
+    ------------------------------------------------------------------------------------------
+
+            Consider an ASP program Π containing the following rules:
+                    p(X) ← not q(X). 
+                    q(X) ← not p(X). 
+                    t(a).
+                    t(b).
+                    (a) What is the grounding of Π?
+                    (b) Find all answer sets of Π
+
+                    (a) Grounding 
+
+                        p(a) :- not q(a)
+                        p(b) :- not q(b)
+                        q(a) :- not p(a)
+                        q(b) :- not p(b)
+                        t(a)
+                        t(b)
+
+                    (b) Answer set
+
+                        S = {t(a), t(b), q(a), q(b)}
+                        S2 = {t(a), t(b), p(a), p(b)}
+                        S3 = {t(a), t(b), p(a), q(b)}
+                        S4 = {t(a), t(b), p(b), q(a)}
+                    
+    Entailment :
+    A program Π entails a literal l, denoted as Π |= l, if l is in all answer sets of Π.
+
+    |= (symbol of entail)
+
+    Query Answering:
+
+        Query: is a conjuction or disjunction of literal.
+            Example of query is : 
+                tutor(X) ∧ student(Y), here ∧(and) is conjuction.
+        Ground Query: is a query where each literal is a ground literal.
+
+    The answer to a query is defined as follows.
+        Answer: yes, if something we know i.e. - if atom (let's say p(a)) Belongs to S.
+                no, if something we don't know. - if -atom (let's say p(b)) Belongs to S.
+                unknown otherwise, if we have no idea. if atom, -atom both doesn't Belongs to S.
+    Exercise : 
+    ------------------------------------------------------------------------------------------
+        Answer to a Query p(a) ← not q(a)
+        This program has one answer set {p(a)}. What does it answer to the following queries?
+        1. p(a) - Yes
+        2. q(a) - Unknown
+        3. p(a)∧q(a) - Unknown
+        4. p(a) or q(a) - Yes
+        5. p(X) - Yes
+
+
+        Let us make a new program by adding a rule to the previous one: 
+        p(a) ← not q(a).
+        ¬q(X ) ← not q(X ). “If q(X ) is not believed to be true,
+        believe that it is false.”
+        This program has one answer set {p(a), ¬q(a)}. What does it answer to the following queries?
+        1. p(a) - Yes
+        2. q(a) - No
+        3. p(a)∧q(a) - No // because this rule is not in answer set
+        4. p(a) or q(a) - Yes 
+        5. p(X) - Yes
+
+
+    Till End of Lecture 4 video.
+
+    Formal Semantics 1: ( if a program does not contain default negation)
+        In Formal semantics, Answer set definition has two parts:
+        1. Define answer sets of program without default negation
+        2. How to remove the default negation so that we can apply part 1.
+
+        Example of these are at lect 4 slide 29.
+
+    Formal Semantics 2: when program contains default negation (not)
+        definition
+        1. removing all rules containing not l such that l ∈ S;
+        2. removing all other premises containing not.
+
+        S is an answer set of Π if S is an answer set of ΠS.
+        We refer to ΠS as the reduct of Π with respect to S.
+
+    So for reduct, suppose we have a program Π as,
+    a <- not b
+    b <- 
+    then our Answer set would be, S = {b}.
+    according to this, we can see that b defats "not b". Now, by applying the two rules of reduct :
+        1. removing not rules contained in S.
+        2. Removing all not parts.
+
+    So with the help of our first rule, we can delete the rule containing "not b". therefore our program 
+    Π(S) would become : 
+    b <- 
+
+    Now let's say we have Π as : 
+    a <- not b.
+    b <- not c.
+    then our Answer set would be, S = {b}.
+    By applying the two rules of reduct : 
+    1. will remove "not b" condition rule.
+    Now, our Program becomes :
+    b <- not c.
+    By applying second rule: 
+    2. we can remove "not c" as it is not required because it is not in our set.
+    therefore our program Π(S) would become : 
+    b <- 
+
+Lecture 5.
+------------------------------------------------------------------------------------------
+    Knowledge Base - 
+
+    The collection of statement about the world that we give to our agent
+    is called a Knowledge base.
+
+    Unsafe Variables -
+
+    In a rule, a variable X is called unsafe if X only occurs in the head, 
+    and/or in the negative body of the rule (i.e., starting with not).
+
+    CWA - Closed World Assumption -
+
+        the Closed World Assumption (CWA) states that if an agent does not know whether 
+        a fact is true or not, then the agent would assume this fact is false.
+
+        we want a confident answer than "Unknown or Don't Know" from our agent. So if our agent
+        does not know if bob is a father of sam. then we should make an extra rule so that agent
+        instead of assuming can say that bob is not a father of sam with more confidence. 
+
+        -father(X,Y) :- not father(X,Y)
+
+        this, not father(X,Y) is called CWA.
+
+    Inheritance hierarchy - 
+
+        Inheritance hierarchy can be used to significantly simplify our knowledge representation.
+        Inheritance hierarchy is a tree-like structures of classes and subclasses.
+        Objects in a subclass will inherit all properties of the class that the underlying 
+        subclass belongs to.
+
+Lecture 6.
+------------------------------------------------------------------------------------------
+    Defaults:
+        A default is statement that contains word as normally, typically etc for which exceptions
+        are tentative. For example, normally all birds can fly.
+
+        For example,
+        cares(X,Y) :- parent(X,Y) // if x is parent of y then x cares y.
+        -cares(John, Y) :- parent(John, Y) // if john is parent of Y then John doesn't care about Y.
+
+        Now this is contradiction, we will see below how to resolve.
+
+    Abnormal predicate :
+        ab(d(X)) // X is Abnormal with respect to d or a default d is not applicable to X.
+        the general form to put Abnormal default is :
+
+        p(X) ← c(X),
+                not ab(d(X)),
+                not ¬p(X).
+        
+        In terms of above example,
+        cares(X,Y) :- parent(X,Y),
+                    not ab(d_cares(X,Y)),
+                    not -cares(X,Y).
+        
+        this means if john is parent of Y and there is no information about if X and Y are defaults
+        and if there is abnormality between them and then if we have no information about if X doesn't
+        care about Y.
+
+        The new program is consistent and entails ¬cares(john,sam) and cares(alice, sam).
+
+    Two Types of exceptions:
+
+    Weak exceptions :- they make the default inapplicable, in other words, we can derive abnormality
+        based on weak exceptions.
+        For example :-
+            ab(d(X)) ← not ¬e(X) // if we have no information about there is no exceptions for X,
+            then that means default of X is Abnormal.
+        
+    Strong exceptions :- It allows the agent to derive the opposite of default. Means, if we have
+        exceptions, then we can make the opposite of what we believe.
+
+        If there is strong exceptions then we add below code with the above code(weak exception), which
+        defeats the default confusion.
+        For Example :- 
+            ¬p(X) ← e(X). // if there is an information about X being an exception. then we can
+            derivation X doesn't implement p.
+
+    Program :-
+    ------------------------------------------------------------------------------------------
+
+        %% Given
+        %% A scenario: John and Alice are Sam and Bill’s parents. 
+        %% YOU (the agent) are Sam’s teacher and Sam is doing poorly in class. 
+        %% You tells John that Sam needs some extra help to pass, because you are thinking:
+        %% (a) John is Sam’s parent.
+        %% (b) Normally, parents care about their children.
+        %% (c) Therefore, John cares about Sam and will help him study.
+
+        parent(john,sam).
+        parent(alice,sam).
+        atom(john,sam).
+        atom(alice,sam).
+        -absent(alice,sam).
+        %%atom(sam).
+        %% parent(john,bill).
+        %% parent(alice,bill).
+
+        %% cares(X,Y) :- parent(X,Y).
+        %% Given John doesn't care.
+        %% -cares(John,Y) :- parent(John,Y).
+        %% here, we got contradiction.
+
+
+        %% strong exception.
+        -cares(john,Y) :- parent(john,Y).
+
+        %% Using Abnormal predicate
+        cares(X,Y) :- parent(X,Y),
+                        not ab(d_cares(X,Y)),
+                        not -cares(X,Y).
+
+
+
+        %% weak exception.
+        %% now agent says parents cares student if they show up in school meeting.
+        %% So, it doesn’t want to apply the cares(P,C) default to anyone that is “absent”.
+        %% What should it assume about Alice caring for Sam if it knows:
+        %% that Alice has been seen at Sam’s school
+        %% (¬absent(alice, sam))?
+        %% that Alice has never been seen at Sam’s school
+        %% (absent(alice, sam))?
+        %% nothing about Alice’s absence?
+
+        %% here, we apply weak exception.
+
+        ab(d_cares(X,Y)) :- not -absent(X,Y),
+                            atom(X,Y).
+
+        %%absent(alice,sam).
+
+    More program in lecture 6, pitKathy.lp file.
+
+    Preference between default:
+
+    If we have two defaults d1 and d2, and we prefer d1 then that can be done via strong exception
+    rule.
+
+Lecture 7.
+------------------------------------------------------------------------------------------
+    ASP:
+        - syntax
+        - semantics(very important)
+            two definition to define answer set
+    Hamiltonian cycle :
+        graph - vertices and edges
+        cycles - collection of statements of the form in(v0,v1), .. , in(vk,v0) 
+                this states that the edge from vertex v0 to vertex v1.
+
+    cycle :
+        Three conditions make a set of atoms of the from in(V1,V2) a Hamiltonian cycle; 
+        the collection of atoms:
+        1. leaves each vertex at most once; 
+        2. enters each vertex at most once; 
+        3. enters every vertex of the graph.
+
+    Choice Rule :
+        the choice rule allows us to generate answer sets of various cardinalities, 
+        based on previously defined predicates.
+
+        In Choice rule, we have our head like :
+        0 <= {p(X): q(X)} <= 1 :- <body>. ---(1)] this head is like a choice rule head and different from 
+        traditional heads of ASP.
+
+        In (1) line, it says if q(X) is true the p(X) is true also and number of p(X) has to be either
+        0 or 1.
+
+        therefore answer set of that should be :
+        {q(x)} -- with 0 number of p(x)
+        {p(x), q(x)} -- with 1 number of p(x)
+
+
+
+
+
+
+
+

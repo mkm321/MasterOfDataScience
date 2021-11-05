@@ -1,0 +1,652 @@
+---
+title: "NOD_Codes"
+author: "Mohit Mehndiratta"
+date: "27/10/2021"
+output: word_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Iraqi Refugees
+
+## Loading the data
+```{r}
+iraqi = c(123, 70, 93, 157)
+aihw = c(70.65, 18.5, 7.41, 3.43)
+levs = c("low", "moderate", "high", "very high")
+names(iraqi) = levs
+names(aihw) = levs
+
+m <- rbind(iraqi,aihw)
+m
+```
+
+## Visualisation
+```{r}
+barplot(m, beside = TRUE, col = 2:3,
+        legend.text = c('Refugees', 'Australians'))
+```
+
+## Hypothesis Testing
+
+H0: There is no difference in distribution of distress between iraqi and aihw
+H1: There is a difference
+CV: 0.05
+
+```{r}
+expected = aihw * 443 / 100
+cs <- sum((iraqi - expected) ^ 2 / expected)
+cs
+
+d <- replicate(5000, {
+  obs <- rmultinom(1, 443, expected)
+  sum((obs - expected) ^2 / expected)
+})
+hist(d, col="lightblue", xlim = c(0,1580))
+abline(v = cs, col = "red")
+
+pVal <- mean(d > cs)
+pVal
+```
+
+And another method for hypothesis testing
+```{r}
+chisq.test(iraqi, p = aihw, rescale.p = TRUE, simulate.p.value = TRUE, B = 5000)
+
+```
+
+# Eye Color:
+## Loading the data:
+
+```{r}
+male = c(98, 101, 47, 33)
+female = c(122, 114, 46, 31)
+levs = c("Brown", "Blue", "Hazel", "Green")
+names(male) = levs
+names(female) = levs
+
+m <- rbind(male,female)
+m
+```
+
+## Visualisation
+```{r}
+barplot(m, beside = TRUE,col = c("Royalblue", "indianred"),
+        main = "Distribution of Eye Colours",
+        ylab = "Number of Occurrences",
+        legend = TRUE)
+```
+
+## simulation
+```{r}
+chisq.test(m, rescale.p = TRUE, simulate.p.value = TRUE, B = 5000)
+```
+
+# EELS
+## Loading the data:
+```{r}
+eels <- matrix(c(264, 161, 127, 116, 99, 67), ncol = 3)
+
+speciesLabels <- c('G.moringa', 'G.vicinus')
+locationLabels <- c('Border', 'Grass', 'Sand')
+
+dimnames(eels) <- list(species = speciesLabels,
+                       location = locationLabels)
+eels
+
+sampleSize = sum(eels)
+```
+
+## Visualisation:
+```{r}
+eels1 = eels ## Proportions
+eels1[1,] = eels[1,] / sum(eels[1,])
+eels1[2,] = eels[2,] / sum(eels[2,])
+eels1
+
+
+barplot(eels1, beside = TRUE,col = c("Royalblue", "indianred"),
+        main = "Distribution of Eels",
+        ylab = "Number of Occurrences",
+        legend = TRUE)
+```
+
+## Simulation
+
+```{r}
+speciesCount = rowSums(eels)
+locationProps = colSums(eels) / sampleSize
+
+# our expected distribution
+exp <- outer(speciesCount, locationProps)
+
+cs <- sum((eels - exp)^2 / exp)
+# Simulate / the distribution of differences
+#
+# simulate the data, assuming that the species
+# does not effect the location
+speciesProps <- speciesCount / sampleSize
+
+d <- replicate(5000, {
+  # sample of species
+  sp <- sample(speciesLabels,
+               size = sampleSize,
+               replace = TRUE,
+               prob = speciesProps)
+  
+  # sample of locations
+  lc <- sample(locationLabels,
+               size = sampleSize,
+               replace = TRUE,
+               prob = locationProps)
+  
+  # tabulate the results
+  res <- table(sp, lc)
+  
+  
+  # re-compute the expected
+  r <- rowSums(res)
+  c <- colSums(res) / sum(res)
+  
+  ex <- outer(r, c)
+  
+  
+  # compute diff between sample and expected
+  sum((res - ex)^2 / ex)
+})
+
+hist(d, col="lightblue")
+abline(v = cs, col = "red")
+
+pVal <- mean(d > cs)
+pVal
+
+
+chisq.test(eels, simulate.p.value = TRUE, B = 5000)
+```
+
+# Card Piles
+## Simulation
+```{r}
+x1 <- sample(1:52)
+x2 <- sample(1:52)
+
+# x1 <- x2 with this commented out, x1 and x2 are different, otherwise identical
+
+cs <- sum((x1 - x2)^2)
+
+# Simulate what is supposedly random
+d <- replicate(1000,
+               {
+                 a <- sample(1:52)
+                 b <- sample(1:52)
+                 
+                 sum((a - b)^2)
+               })
+
+hist(d)
+abline(v = cs, col = 2, lwd = 2, lty = 2)
+```
+
+## Birth Weight
+## Loading the data
+```{r}
+birthWeight <- read.csv("../datasets/birthwt.csv")
+head(birthWeight)
+table(birthWeight$smoke)
+summary(birthWeight)
+aggregate(bwt~smoke, birthWeight, mean)
+```
+
+## Visualisation
+```{r}
+boxplot(bwt~smoke, birthWeight, col = c(7,5), horizontal = TRUE)
+```
+
+## Hypothesis Testing
+```{r}
+# H0: mu1 == mu2, There is no difference
+# H1: mu1 < mu2, There is a difference
+
+delta <- aggregate(bwt ~ smoke, birthWeight, mean)$bwt
+delta
+
+cs <- -diff(delta)
+
+d <- replicate(5000, {
+  smoke.shuffle <- sample(birthWeight$smoke)
+  del <- aggregate(bwt~smoke.shuffle, birthWeight, mean)$bwt
+  -diff(del)
+})
+
+hist(d, main = '', col = 'skyblue', xlim = c(-1, 1) * 300)
+abline(v = cs, col = "red", lwd = 2, lty = 2)
+
+# One sided test, so p-value calculation uses one side of the distribution
+# The +ve side is used since mu2 - mu1 > 0
+pVal <- mean(d > cs)
+```
+
+# Drugs Data
+## Loading the data
+```{r}
+# Loading the drug data from file "assignmentB_drugData.csv".
+drug_data <- read.csv("../datasets/drugs.csv")
+head(drug_data) # viewing the first 6 rows of the data
+```
+
+## Visualisation
+```{r}
+## Visualisation
+boxplot(response~drug, data = drug_data, pch = 16,
+        col = c("cornflowerblue","orange"))
+```
+
+## Hypothesis Testing
+
+```{r}
+# For the Hypothesis, we are using null and alternate hypothesis as follows:
+
+# H0: mu1 == mu2, There is no statistically significant improvement exist for new drug over ref drug.
+# H1: mu1 > mu2, There exists a statistically significant improvement for new drug over ref drug.
+# CV = 0.05 (5%)
+
+cv <- 0.05 # critical value
+replications <- 5000 # number of replications for simulation
+
+# calculating mean data for new drug and ref drug
+delta <- aggregate(response ~ drug, drug_data, mean)$response
+
+# Calculating difference in means
+cs <- -diff(delta)
+
+cat("Difference in means of new drugs and ref drugs is:", cs, "\n")
+
+# setting the seed value.
+set.seed(2)
+# Simulating the difference in means by 5000 times for the shuffled drug categories within same data.
+d <- replicate(replications, {
+  shuffled_drug <- sample(drug_data$drug) ## Shuffling the drug categories
+  delta <- aggregate(response ~ shuffled_drug, drug_data, mean)$response
+  c <- -diff(delta)
+})
+
+cat("Average difference in means for simulated results",mean(d), "\n\n")
+
+# Visualising the simulated outcome
+hist(d, col = "lightblue", main = "Distribution of difference in means")
+abline(v = cs, col = "red", lwd = 2)
+
+# counting the number of replications which have bigger difference than original difference.
+count <- sum(d > cs)
+
+# calculating p-value
+pvalue <- count/replications
+cat("Calculated p-value from the simulation:", pvalue, "\n\n")
+
+cat("Is critical value greater than p-value?", cv > pvalue, "\n")
+## if true then reject the null hypothesis.
+```
+
+# Spider Data set
+
+## Hypothesis testing
+```{r}
+spider <- read.csv("../datasets/Spider.csv")
+head(spider)
+table(spider$Group)
+summary(spider)
+aggregate(Anxiety~Group, spider, mean)
+
+boxplot(Anxiety~Group, spider, col = c(7,5), horizontal = TRUE)
+
+
+# H0: mu1 == mu2, There is no difference
+# H1: mu1 < mu2, There is a difference
+
+delta <- aggregate(Anxiety~Group, spider, mean)$Anxiety
+delta
+
+cs <- diff(delta)
+
+d <- replicate(5000, {
+  Group.shuffle <- sample(spider$Group)
+  del <- aggregate(Anxiety~Group.shuffle, spider, mean)$Anxiety
+  diff(del)
+})
+
+hist(d, main = '', col = 'skyblue')
+abline(v = cs, col = "red", lwd = 2, lty = 2)
+
+# One sided test, so p-value calculation uses one side of the distribution
+# The +ve side is used since mu2 - mu1 > 0
+pVal <- mean(d > cs)
+```
+
+# Wilcoxon and Confidence Interval example
+```{r}
+# Confidence intervals
+# The luxury of a known populations; use normal distribution
+x <- rnorm(50, 15)	# actual pop mean = 15
+y <- rnorm(50, 10)	# actual pop mean = 10
+# difference in means is actually 5
+# but we pretend we don't know that!
+
+wilcox.test(x, y)                     # Are they different; absolutely
+wilcox.test(x, y, alternative = 'l')  # Is x < y, no way
+wilcox.test(x, y, alternative = 'g')  # Is x > y, absolutely
+
+# Generate estimate of population difference in means
+p <- mean(x) - mean(y)
+p
+
+# Determine a confidence interval for the difference between x and y
+# Generate confidence interval for true difference in population means
+d <- replicate(10000,
+               {
+                 ix <- sample(1:length(x), replace = TRUE)
+                 iy <- sample(1:length(y), replace = TRUE)
+                 
+                 mean(x[ix]) - mean(y[iy])
+               })
+
+hist(d)
+abline(v = 5, col = 2, lwd = 2, lty = 2)
+
+# calculate 95% confidence interval
+q <- quantile(d, c(0.025, 0.975))
+q
+
+abline(v = q, col = 'purple', lwd = 3, lty = 3)
+
+```
+
+# Confidence interval - Birth Weight
+```{r}
+# Confidence interval for maternal smoking dataset
+df <- read.csv('../datasets/birthwt.csv')
+
+# Extract entire data set into the two groups
+no <- subset(df$bwt, df$smoke == 'no')
+yes <- subset(df$bwt, df$smoke == 'yes')
+
+# Difference means for the sample;
+# estimate of difference in population
+res <- mean(no) - mean(yes)
+
+## Alternal approach: delta <- aggregate(bwt~smoke, df, mean)
+# resample using "boostrapping"
+d <- replicate(1000,
+               {
+                 # bootstrapping means doing the following:
+                 #  - create new sample of same size as original
+                 #  - must use replacement;
+                 #    otherwise we generate a shuffled original!
+                 #  - must preserve group sizes; 472 no smoke, 484 smoke
+                 #    so doing the two samples! Don't want to induce differences
+                 ns <- sample(no, replace = TRUE)
+                 s <- sample(yes, replace = TRUE)
+                 
+                 # difference in means
+                 mean(ns) - mean(s)
+               })
+
+# find boundaries for central 95% of the data
+q <- quantile(d, c(0.025, 0.975))
+q     # conf interval, range within which true pop. difference is expected to reside
+
+
+# visualise as matter of interest
+hist(d,
+     main = 'Confidence Interval\nfor\ndifference in means',
+     xlab = 'Difference in means')
+abline(v = res, col = 'blue', lwd = 2) # point estimate of pop mean
+abline(v = q, col = 'purple', lwd = 2, lty = 3) # show confidence interval
+
+```
+
+# Binomial Confidence Interval - Method 1
+
+```{r}
+# Bootstrap binomial confidence intervals for true rate in pop.
+# Method 1
+germinate <- 1
+notGerminate <- 0
+
+seeds <- c(rep(germinate, 15),
+           rep(notGerminate, 5))
+
+d <- replicate(1000,
+               {
+                 res <- sample(seeds, replace = TRUE)
+                 mean(res)
+               })
+mean(d)
+q <- quantile(d, c(0.025, 0.975))
+q
+
+# use of expression allows showing Greek letter
+hist(d, col = 'skyblue', xlab = expression(rho),
+     main = 'Proportion of seeds\nthat germinate')
+abline(v = q, col = 2, lwd = 2, lty = 2)
+```
+
+# Binomial Confidence Interval - Method 2
+
+```{r}
+# Method 2
+d <- rbinom(1000, size = 20, prob = 15/20)
+d <- d / 20
+
+mean(d)
+q <- quantile(d, c(0.025, 0.975))
+q
+
+hist(d, col = 'skyblue', xlab = expression(rho),
+     main = 'Proportion of seeds\nthat germinate')
+abline(v = q, col = 2, lwd = 2, lty = 2)
+```
+
+# Poison distribution confidence interval
+
+```{r}
+# Calculate Poisson confidence interval for true pop. lambda / expected death rate
+horsekick <- c(109, 65, 22, 3, 1)
+deaths <- rep(0:4, horsekick)
+
+d <- replicate(1000,
+               {
+                 res <- sample(deaths, replace = TRUE)
+                 mean(res)
+               })
+mean(d)
+q <- quantile(d, c(0.025, 0.975))
+q
+
+hist(d, col = 'skyblue', xlab = expression(rho),
+     main = 'Proportion of deaths\nby horse kick')
+abline(v = q, col = 2, lwd = 2, lty = 2)
+
+```
+
+# Crabs data - Correlation hypothesis
+
+```{r}
+# Slide 4
+df <- read.csv('../datasets/crabsmolt.csv')
+
+plot(df$postsz ~ df$presz, pch = 19, col = 1, 
+     xlab = 'presz', ylab = 'postsz')
+
+cor(df$presz, df$postsz)
+
+obs.cor = cor(df$presz, df$postsz)
+x= replicate(1000, {
+  post.perm = sample(df$postsz)
+  cor(df$presz, post.perm)
+})
+
+sum(abs(x) > abs(obs.cor))/1000
+
+cor.test(df$presz, df$postsz, method = "pearson")
+```
+
+# Linear Models - Hypothesis testing - slope = 0
+
+```{r}
+# Slide 4
+df <- read.csv('../datasets/crabsmolt.csv')
+
+fit = lm(postsz~presz, data = df)
+summary(fit)
+
+plot(postsz ~ presz, data=df, pch=16)
+abline(fit, col = 2)
+
+## Hypothesis for slope = 0
+
+## compute the slope of the data
+cs <- coef(fit)[2]
+## compute the slope if the population b = 0
+x= replicate(5000, {
+  presz.perm = sample(df$presz) # shuffle one variable to force population b = 0
+  fit = lm(postsz ~ presz.perm, data=df) # fit the straight line model
+  coef(fit)[2] # return the fitted b
+})
+## examine the distribution of b, when the population b = 0
+hist(x, col="lightblue", main="", xlab="", xlim = c(-1,1))
+abline(v = cs, col = 2)
+
+## compute the chance of getting the data b, if the population b = 0
+(pValue = mean(x > abs(cs)) + mean(x < -abs(cs)))
+```
+
+# Linear Models - Hypothesis testing - Slope = 1
+
+```{r}
+# Slide 4
+df <- read.csv('../datasets/crabsmolt.csv')
+## Hypothesis for slope = 1
+
+## compute the estimate of b - 1 from the data
+fit = lm((postsz - presz) ~ presz, data = df)
+cs = coef(fit)[2]
+## compute many sample gradients, when the population gradient is 1
+x= replicate(5000, {
+  presz.perm = sample(df$presz) # shuffle one variable
+  fit = lm((postsz - presz) ~ presz.perm, data = df) # fit the model
+  coef(fit)[2] # return the estimate of b
+})
+## examine the distribution of b - 1, when the population b = 1
+hist(x, col="lightblue", main="", xlab="", xlim = c(-0.1,0.1))
+abline(v = cs, col = 2)
+
+
+
+## compute the chance of getting the data b, if the population b = 1
+(pValue = mean(x > abs(cs)) + mean(x < -abs(cs)))
+
+## Conclusion - Assuming the slope is 1, the probability of seeing 
+## a slope at least this extreme by mere chance is practically 0. 
+## It is concluded that the slope is not equal to 1.
+```
+
+# Linear Models - Confidence interval
+
+```{r}
+# Slide 4
+df <- read.csv('../datasets/crabsmolt.csv')
+
+n = nrow(df) # store the number of observations n
+## compute a set of bootstrap samples of b
+x= replicate(5000, {
+  samp = sample(1:n, replace = TRUE, size = n) # sample the row numbers (with replacement)
+  # fit the regression model to the selected rows (samp) of the data
+  fit = lm(postsz ~ presz, data = df[samp,])
+  coef(fit)[2] # extract the estimate of b
+})
+## examine the bootstrap distribution of b
+hist(x, col = "lightblue", main = "", xlab = "")
+## add the interval lines
+abline(v = quantile(x,c(0.025, 0.975)), col = "blue", lwd = 2)
+## print out the interval boundaries (95% interval)
+quantile(x, c(0.025, 0.975))
+
+```
+
+# QQ - Plot
+
+```{r}
+# Slide 12
+# QQ plot
+#
+# y is the data being considered evaluated
+# x is the normally distributed data being used as a reference
+
+n <- 10  # Try different sample sizes
+y <- rnorm(n)
+# y <- rexp(n)  # could try other distributions
+
+# Order / sort the values
+y <- sort(y)
+
+# P(Z < zi) = i / (n + 1)
+# x represents probabilities (0, 1)
+# BUT zero and one are not included
+x <- 1:length(y) / (length(y) + 1)
+
+# Convert the x values (probabilities) to x axis locations
+x <- qnorm(x)
+
+# Our crude version of a QQ plot
+plot(y ~ x)
+
+# intercept of zero, slope of one
+# crude, probability not the best fit
+abline(coef = 0:1)
+
+# built in functions to do this
+# compare with above
+qqnorm(y) # plot the QQ-plot
+qqline(y) # add the line to the plot showing Normality
+
+# better version
+# An alternative is to use the car add-on library:
+library(car)
+qqPlot(y) # plot a QQ-plot with a line
+
+```
+
+## Birth weight QQ - Normal plot
+
+```{r}
+birthwt = read.csv("../datasets/birthwt.csv")
+with(birthwt, qqPlot(bwt[smoke=="yes"], main="Smokers"))
+with(birthwt, qqPlot(bwt[smoke=="no"], main="Non Smokers"))
+```
+
+# T-test Birth weight
+
+```{r}
+df <- read.csv('../datasets/birthwt.csv')
+
+aggregate(df$bwt, list(df$smoke), length)
+aggregate(df$bwt, list(df$smoke), mean)
+aggregate(df$bwt, list(df$smoke), sd)
+
+# or
+aggregate(bwt ~ smoke, df, sd)
+
+
+# Assuming equal variances in the populations
+t.test(df$bwt ~ df$smoke, var.equal = TRUE,
+       alternative = 't')  # H1: mu1 <> mu2
+t.test(df$bwt ~ df$smoke, var.equal = TRUE,
+       alternative = 'l')  # H1: mu1 < mu2
+t.test(df$bwt ~ df$smoke, var.equal = TRUE,
+       alternative = 'g')  # H1: mu1 > mu2
+
+```
+

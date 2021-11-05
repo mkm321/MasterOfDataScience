@@ -1,0 +1,13 @@
+Consider the following program:
+p(a) ← not p(b). 
+p(b) ← not p(a).
+
+*************
+p(a) :- not p(b).
+p(b) :- not p(a).
+*************
+1. Find all answer set(s) of this program. 
+2. Does Π |= p(a) hold?
+
+1. Set, S1 = {p(b)}, S2 = {p(a)}
+2. since p(a) is not in all answer sets of this program. there for Π does not entail(|=) - p(a).

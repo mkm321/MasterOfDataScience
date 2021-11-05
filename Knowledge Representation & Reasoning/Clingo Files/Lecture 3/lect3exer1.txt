@@ -1,0 +1,32 @@
+(a) Smoke ⇒ Smoke
+(b) (Big ∧ Dumb) ∨ ¬Dumb 
+(c) (A⇒B)∧(B⇒A)
+
+(a) : 
+Smoke => Smoke is simply -Smoke V Smoke
+Truth Table for Smoke is:
+Smoke   -Smoke  Smoke => Smoke
+0       1       1
+1       0       1
+ 
+this shows, (a) is TRUE.
+
+(b) :
+Truth Table:
+Big     Dumb    Big ^ Dumb  -Dumb     Final
+0       0       0           1           1
+0       1       0           0           0           
+1       0       0           1           1
+1       1       1           0           1
+
+not all are 1 in final, this shows (b) is FALSE.
+
+(c) :
+Truth Table
+a   b   -a     -b     a => b    b => a     Final
+0   0    1      1       1       1       1 
+0   1    1      0       1       0       0
+1   0    0      1       0       1       0 
+1   1    0      0       1       1       1
+
+not all are 1 in final, this shows (c) is FALSE.

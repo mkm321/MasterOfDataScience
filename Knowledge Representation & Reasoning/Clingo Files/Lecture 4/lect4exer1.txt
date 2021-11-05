@@ -1,0 +1,8 @@
+Consider the following program Π: 
+p(a) ← not p(a).
+p(a).
+Find all answer set(s) of this program.
+
+Answer : 
+    S = {p(a)}
+    

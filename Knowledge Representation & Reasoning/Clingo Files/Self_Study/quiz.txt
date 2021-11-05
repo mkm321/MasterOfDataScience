@@ -1,0 +1,14 @@
+a b c   a => b  -c  (a ^ -c)    (a ^ -c) => b   -b      (-b V c)     a => c
+0 0 0   1       1   0           0               1           1           1
+0 0 1   1       0   0           0               1           1           1
+0 1 0   1       1   0           0               0           0           1
+0 1 1   1       0   0           0               0           1           1
+1 0 0   0       1   1           1               1           1           0
+1 0 1   0       0   0           0               1           1           1
+1 1 0   1       1   1           0               0           0           0
+1 1 1   1       0   0           0               0           1           1
+
+From the above truth table we can see that a => c has some 0(False) in the table.
+and not all are 1 in a => c as seen in truth table,
+
+So S doesn’t entail a => c, means this is false.

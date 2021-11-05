@@ -1,0 +1,66 @@
+## doubts
+1. Marking criteria - Code testing (1 mark) what is the expectation from this criteria?
+2. how to make a table.
+
+Requirements : 
+question 1:
+-> total runs scored by each team for each match
+Output Format: 
+    Match_number | Home_team | away_team | home_team_runs | away_team_runs
+
+Answer: will create data.frame first and put entries in the form of Match_number, Home_team, away_team. home_team_runs, away_team_runs.
+
+## doubts
+1. who are the home and away teams.
+
+question 2:
+given data :
+-> winner of each match is determined by total number of runs
+-> Scores: 3 point for winning a match, 1 point for draw.
+-> season winner is team with the most number of scores.
+
+TODO :
+-> compute each team scores after the 14 matches and 28th matches
+-> display the results in two table ordered by scores (high to low).
+
+Answer: 1. calculate the total scores for each team, send them into a data.frame as point_table: team_name, score.
+
+## doubts:
+1. for the team scores after 28 matches(second table), do we need to compute from 1 or 15?
+
+question 3:
+
+TODO:
+1. create a function that takes the file matchResults.json as the only argument
+2. compute each team'/s total matches played and home matches played inside the function.
+3. Store them in a data.frame and return the same from the function.
+4. display a table for the returned data.frame
+
+Answer: 
+
+## doubts:
+1. do we need to pass json file in the form of string as an argument to the function 
+    or the transformed list data structure to the function.
+
+question 4:
+
+given:
+1. if players have same average number of wickets taken per game then order them on the basis of number of matches played.
+
+TODO:
+1. create table with player name and their average numbers of wickets per game for Parramatta team only.
+2. order the table from high to low average number of wickets.
+
+
+
+
+166(GUINEVERE Q.) - 3 matches 3 average wickets
+105(INDIE N.) - 2 matches 3 average wickets
+187(CHESTER G.) - 2 matches 3 average wickets
+137 GRAYSON P. - 2 matches - 2 average wickets
+58 ROBYN F. - 1 match - 2 average wickets
+157 ANTHONY-JAY O. - 1 match - 2 average wickets
+133 OLAF J. - 2 matches - 1 average wickets
+9 TOBIAS D. - 1 match - 1 average wickets
+61 EVELYNN S. - 1 match - 1 average wickets
+132 YUSAIRAH M. - 1 match - 1 average wickets

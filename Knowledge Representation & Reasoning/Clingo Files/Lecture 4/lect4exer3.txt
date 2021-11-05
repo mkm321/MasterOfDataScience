@@ -1,0 +1,43 @@
+3. Consider the following program written in ASP solver clingo syntax:
+   s(b).
+   -s(c).
+   r(a).
+   p(a) | p(b).
+   q(X) :- p(X), r(X), not s(X).
+Run clingo command to compute all answer set(s) of this program, 
+and then verify each answer set against the program, by following the answer set definition.
+
+Answer Sets came : 
+1. S1 = {s(b) -s(c) r(a) p(a) q(a)}
+2. S2 = {s(b) -s(c) r(a) p(b)}
+
+** Here we need to do grounding as well **
+Grounding:
+s(b).
+-s(c).
+r(a).
+p(a) | p(b).
+q(a) :- p(a), r(a), not s(a)
+q(b) :- p(b), r(b), not s(b)
+q(c) :- p(c), r(c), not s(c)
+Verification : 
+   So, for this reduct have two rules:
+   1. removing all rules containing not l such that l ∈ S;
+   2. removing all other premises containing not.
+
+   In this we can see, s(b) defeats "not s(X)". So, by applying the Answer set definition our program becomes : 
+      s(b).
+      -s(c).
+      r(a).
+      p(a) | p(b).
+      q(X) :- p(X), r(X).
+
+   And the answer set of this program is:
+   Answer: 1
+   S1 = { s(b) -s(c) r(a) p(a) q(a) }
+   Answer: 2
+   S2 = { s(b) -s(c) r(a) p(b) }
+
+   From here, we can confrim that, S is an answer set of program 1 and program 2.
+
+

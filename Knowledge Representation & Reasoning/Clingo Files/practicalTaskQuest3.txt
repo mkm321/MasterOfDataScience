@@ -1,0 +1,39 @@
+Consider the following program:
+p(1).  
+p(2). 
+q(1).  
+q(2).
+r(X+Y) :- p(X), q(Y), X<Y.
+(a) This program has a unique answer set, what is it?  
+(b) Please slightly modify this program, so that the answer set of the modified program will contain the facts
+{r(0), r(1), r(2), r(3)}.
+
+Note: Your modification has to only  add minimal number of rules involving predicates p, q, and r.
+
+(a) Answer set of this program is : 
+    S = { q(1) q(2) p(1) p(2) r(3) }
+(b) 
+Case 1:
+p(1).  
+p(2). 
+q(1).  
+q(2).
+r(X+Y) :- p(X), q(Y).
+Answer : q(1) q(2) p(1) p(2) r(2) r(3) r(4) // we don't want r(4) here.
+Case 2:
+p(1).  
+p(2). 
+q(1).  
+q(2).
+r(X+Y) :- p(X), q(Y), X<Y
+r, X = Y, X != 2.
+r(X-Y) :- p(X), q(Y), X>=Y.
+Answer: q(1) q(2) p(1) p(2) r(0) r(1) r(2) r(3)
+
+p(1).  
+p(2). 
+q(1).  
+q(2).
+r(X+Y) :- p(X), q(Y), X<Y.
+r(X-Y+1) :- p(X), q(Y).
+

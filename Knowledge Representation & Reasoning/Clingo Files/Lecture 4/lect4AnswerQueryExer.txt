@@ -1,0 +1,35 @@
+Answer to a Query :- p(a) ← not q(a)
+This program has one answer set {p(a)}. What does it answer to the following queries?
+1. p(a)
+2. q(a)
+3. p(a)∧q(a) 
+4. p(a) or q(a) 
+5. p(X)
+
+1. yes
+2. don't know
+3. don't know
+4. yes ( because or is here)
+5. yes
+
+------------------------------------------------------------------------------------------
+
+Let us make a new program by adding a rule to the previous one: 
+p(a) ← not q(a).
+¬q(X) ← not q(X). 
+“If q(X) is not believed to be true, believe that it is false.”
+
+This program has one answer set {p(a), ¬q(a)}. What does it answer to the following queries?
+1. p(a)
+2. q(a)
+3. p(a)∧q(a) 
+4. p(a) or q(a) 
+5. p(X)
+
+1. yes
+2. no (beacause we have negation)
+3. no
+4. yes
+5. yes
+
+

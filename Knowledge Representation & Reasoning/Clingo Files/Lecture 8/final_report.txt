@@ -1,0 +1,103 @@
+R1
+Y1
+B1
+G1
+B2      B2
+G2      G2
+R2      R2
+Y2      Y2
+B3      B3              B3              R3   B3   G3
+R3      R3              R3 R2 B2 G2     R2   B2   G2
+G3      G3 R1 B1 G1     G3 R1 B1 G1     R1   B1   G1
+-------------------------------------------------------
+0       1               2               3
+action    -  put ( put some block on something )
+          -  delete ( delete the yellow blocks )
+
+objects - R1,Y1,B1,G1,B2,G2,R2,Y2,B3,R3,G3
+
+statics - 
+    Blocks :
+        block(R1),block(Y1),block(B1),block(G1),block(B2),
+        block(G2),block(R2),block(Y2),block(B3),block(R3),block(G3)
+    Locations :
+        loc(R1), loc(B1), loc(G1), loc(T)
+
+fluents - on(#block(X), #location(Y)) -  we treat on as a function and not a predicate
+
+, put(#block(X), #location(Y)), delete(#block)
+
+relations - holds(#fluent, #step), occurs(#action, #step)
+            holds(on(B,L), I), occurs(put(B,L), I)
+
+Problem statement:
+
+Consider 11 cubes, out of which 3 cubes are red in colour, 3 cubes are blue in colour,
+3 cubes are green in colour and 2 cubes are yellow in colour. They are stacked randomly
+on each other on a table and creating a single stack. We have to perform 2 actions. One is "put"
+in which a robot has to put a cube either on the table if there is an empty space and none
+of the cube placed matches the colour of that cube, otherwise put the cube on the same 
+colour of the cube. Another action is "remove", in which a robot has to remove the cube which
+is yellow in colour. Thus in the final step we should have 3 stacks of cubes of colours red,
+blue and green.
+                        Transition Diagram
+
+                            R1
+                            Y1
+                            B1
+                            G1
+                            B2      
+                            G2      
+                            R2      
+                            Y2      
+                            B3 (transition)  R3   B3   G3
+                            R3 ----------->  R2   B2   G2
+                            G3               R1   B1   G1
+                            ------------------------------
+                            0(start)         11( final)
+
+System Description, Signature:
+ cube = {r1,y1,b1,g1,b2,g2,r2,y2,b3,r3,g3}
+ loc = {r1,y1,b1,g1,b2,g2,r2,y2,b3,r3,g3,t}
+ inertial fluent on(C1,L1) which states Cube C1 is on location L1
+ defined fluent above(C1,L1) which states Cube C1 is above location L1
+ action = put(C1,L1) which states put Cube C1 at location L1, remove(C1) which states
+            remove the cube C1.
+ n = 11
+ step = 0..n
+
+SD:
+    Causal Law: 
+        put(C1, L1) causes on(C1, L1)
+    State Constraints:
+        -on(C1,L1) if not on(C1,B1)
+        -on(C1,L1) if remove(C1)
+        removed(C1) if remove(C1) %% subject to understanding
+        -on(C1,L2) if on(C1,L1), L1 != L2
+        -on(C2,C) if on(C1,C), C1 != C2
+        above(C1,L1) if on(C1,L1)
+        above(C1,L1) if on(C1,C2), on(C2,L1)
+    Executability Conditions:
+        impossible put(C1,L1) if on(C2,C1), loc(L1)
+        impossible put(C1,C2) if on(C3,C1), on(C2,C4)
+        impossible put(C1,L1) if on(C1,L2), on(C2,L1), C1 != C2
+
+R1
+Y1  Y1
+B1  B1     B1     
+G1  G1     G1     G1
+B2  B2     B2     B2        B2
+G2  G2     G2     G2        G2           G2
+R2  R2     R2     R2        R2           R2           R2
+Y2  Y2     Y2     Y2        Y2           Y2           Y2           Y2
+B3  B3     B3     B3        B3           B3           B3           B3           B3
+R3  R3     R3     R3        R3           R3    B2     R3    B2 G2  R3 R2 B2 G2  R3 R2 B2 G2
+G3  G3 R1  G3 R1  G3 R1 B1  G3 R1 B1 G1  G3 R1 B1 G1  G3 R1 B1 G1  G3 R1 B1 G1  G3 R1 B1 G1
+--  -----  -----  --------  -----------  -----------  -----------  -----------  -----------
+0   1        2       3           4           5            6            7           8
+
+      B3        R3 B3     R3 B3 G3
+R3 R2 B2 G2     R2 B2     R2 B2 G2
+G3 R1 B1 G1  G3 R1 B1 G1  R1 B1 G1
+-----------  -----------  ----------
+     9            10          11

@@ -1,0 +1,11 @@
+%% Clingo program
+
+faster(X,Y) :- engine(X,1), engine(Y,2).
+faster(X,Z) :- upgrade(X,Y), faster(Y,Z).
+faster(X,Z) :- faster(X,Y), faster(Y,Z).
+engine(X,I) :- upgrade(X,Y), engine(Y,I).
+engine(spaceWatcher, 1).
+engine(skySeeker, 2).
+upgrade(skyWalker, skySeeker).
+upgrade(spaceConnector, spaceWatcher).
+

@@ -1,0 +1,36 @@
+2. Consider the following program Π:
+r(a).
+r(b).
+s(c).
+p(X,Y) ← not q(X,Y). 
+q(X,Y) ← not p(X,Y).
+(a) Add Closed World Assumption rules into Π, to form a new program Π′,
+so that we can always derive negative information for all these predicates. 
+(b) Also transform your Π′ into clingo syntax and run it under clingo.
+
+Answer :
+
+Program with safe variables : 
+r(a).
+r(b).
+s(c).
+atom(a).
+atom(b).
+atom(c).
+p(X,Y) :- not q(X,Y), atom(X), atom(Y). 
+q(X,Y) :- not p(X,Y), atom(X), atom(Y).
+
+Adding CWA : 
+
+r(a).
+r(b).
+s(c).
+atom(a).
+atom(b).
+atom(c).
+p(X,Y) :- not q(X,Y), atom(X), atom(Y). 
+q(X,Y) :- not p(X,Y), atom(X), atom(Y).
+-p(X,Y) :- not p(X,Y), atom(X), atom(Y).
+-q(X,Y) :- not q(X,Y), atom(X), atom(Y).
+-r(X) :- not r(X), atom(X).
+-s(X) :- not s(X), atom(X).

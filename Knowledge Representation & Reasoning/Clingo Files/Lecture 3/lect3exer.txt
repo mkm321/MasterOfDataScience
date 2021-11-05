@@ -1,0 +1,40 @@
+Consider a knowledge base KB consisting of the following formulas (sentences):
+P ∨ Q,
+Q ⇒ (R ∧ S), ¬P.
+1. List all models of KB
+2. Check whether KB |= S
+
+1. Models are
+P Q R S     P v Q       Q ⇒ (R ∧ S)     ¬P
+0 0 0 0
+0 0 0 1
+0 0 1 0
+0 0 1 1
+0 1 0 0
+0 1 0 1
+0 1 1 0
+0 1 1
+1 0 0
+1 0 0
+1 0
+1 0
+1 1
+1 1
+1 1
+1 1
+0 0
+0 0
+0 0
+0 0
+0 1
+0 1
+0 1
+0 1
+1 0
+1 0
+1 0
+1 0
+1 1
+1 1
+1 1
+1 1

@@ -1,0 +1,24 @@
+Program:
+
+p(X)  <- not q(X)
+q(X)  <- not p(X)
+t(a)
+t(b)
+
+Objects - {a,b}
+
+now we have,
+p(a) <- not q(a)
+p(b) <- not q(b)
+q(a) <- not p(a)
+q(b) <- not p(b)
+t(a)
+t(b)
+
+
+Grounding - p(a), ~p(a),  
+
+S = {t(a), t(b), p(a), p(b)}
+S = {t(a), t(b), p(a), q(b)}
+S = {t(a), t(b), q(a), q(b)}
+S = {t(a), t(b), q(a), p(b)}

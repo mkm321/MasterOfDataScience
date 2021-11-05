@@ -1,0 +1,84 @@
+Π consists of the following two rules: 
+p(b) ← q(a).
+q(a).
+can check that {p(b), q(a)} is the only answer set of Π. 
+What about entailment and answers to queries?
+1. ?q(a) 
+2. ?¬q(a) 
+3. ?p(b) 
+4. ?¬p(b)
+
+Answer :
+    1. yes
+    2. no
+    3. yes
+    4. no
+
+------------------------------------------------------------------------------------------
+Example (2)
+p(a) ← p(b). 
+¬p(a).
+Compute this program’s answer set, and answer the following queries?
+1. ?p(a) 
+2. ?¬p(a) 
+3. ?p(b) 
+4. ?¬p(b)
+Note that this example demonstrates that ← is not classical implication.
+
+answers :
+Answer set will be : {-p(a)}
+    1. no
+    2. yes
+    3. don't know
+    4. don't know
+------------------------------------------------------------------------------------------
+
+Example (3)
+Empty Set Answer Set.
+p(b) ← ¬p(a).
+1. What is the answer set of this program? 
+2. What do we believe about ¬p(a)? 
+3. How about p(b)?
+
+Answer :
+    1. So, let's say if we can have only -p(a) in our set. S1 = {-p(a)} // this is not correct as we don't have p(b).
+        Now, let's add p(b), S2 = {-p(a), p(b)} this satisfies our given rule. But second rule of satisfication say's
+        ** A set should be minimal. **. So now, we can say that if we put empty set, S3 = {} // now this is minimal
+        and satisfies. 
+        
+        Now we have to choose which one is correct from S1,S2 and S3. Clearly S3 is minimal and satisfies our rules.
+        So this will be our set.
+    2. 
+    3.
+
+------------------------------------------------------------------------------------------
+Example (4)
+Epistemic Disjunction. p(a) or p(b).
+This program has two answer sets A1 = {p(a)} and A2 = {p(b)}. 
+Does this program entail p(a)?
+What does the following program entail?
+p(a) or p(b). 
+q(a) ← p(a). 
+q(a) ← p(b).
+
+Answer : sets A1 = {p(a), q(a)} and A2 = {p(b), q(a)}.
+------------------------------------------------------------------------------------------
+Example (5)
+p(a) or ¬p(a) Is Not the Same As p(a) ∨ ¬p(a).
+p(b) ← ¬p(a). 
+p(b) ← p(a). 
+p(a) or −p(a).
+The addition of the last rule forces the agent to make a decision one way or the other, instead of remaining undecided. 
+Instead of an empty set, we have two answer sets: {p(a), p(b)} and {¬p(a), p(b)}. 
+What does this program entail?
+
+Answer : 
+
+------------------------------------------------------------------------------------------
+Example (6)
+Constraint Revisited. 
+p(a) or p(b).
+← p(a).
+We have two answer sets from the first rule, but the second rule makes us exclude the possibility of {p(a)} 
+because it is impossible to satisfy an empty head if the body is satisfied.
+So this program has a unique answer set {p(b)}.

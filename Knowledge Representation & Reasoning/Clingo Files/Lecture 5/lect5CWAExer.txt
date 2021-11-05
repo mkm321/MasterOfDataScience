@@ -1,0 +1,49 @@
+Consider a program Π consisting of the following rules:
+r (a).
+r(b).
+p(X) ← not q(X). 
+q(X) ← not p(X).
+(a) Compute all answer sets of program Π.
+(b) Add CWA rules for predicates p and q into Π, to form a new program Π′.
+(c) Compute all answer sets of Π′.
+
+Answer : 
+    (a) : Answer sets are:
+        Answer: 1
+        atom(a) atom(b) r(a) r(b) q(a) q(b)
+        Answer: 2
+        atom(a) atom(b) r(a) r(b) q(a) p(b)
+        Answer: 3
+        atom(a) atom(b) r(a) r(b) p(a) q(b)
+        Answer: 4
+        atom(a) atom(b) r(a) r(b) p(a) p(b)
+    (b) : So for this, we want to be confident about our results,
+    therefore, we can add negation of our rules to ensure, if someone
+    asks about not p(X), we should be more confident by saying -p(X) and not just q(X).
+    r(a).
+    r(b).
+    p(X) ← not q(X). 
+    q(X) ← not p(X).
+    -p(X) :- not p(X), atom(X). // added atom just to be safe.
+    -q(X) :- not q(X), atom(X).
+
+    our final program is : 
+r(a).
+r(b).
+atom(a).
+atom(b).
+p(X) :- not q(X), atom(X). 
+q(X) :- not p(X), atom(X).
+-p(X) :- not p(X), atom(X).
+-q(X) :- not q(X), atom(X).
+-r(X) :- not r(X), atom(X).
+
+(c) : Answer sets are : 
+Answer: 1
+atom(a) atom(b) r(a) r(b) q(a) q(b) -p(a) -p(b)
+Answer: 2
+atom(a) atom(b) r(a) r(b) q(a) p(b) -q(b) -p(a)
+Answer: 3
+atom(a) atom(b) r(a) r(b) p(a) q(b) -q(a) -p(b)
+Answer: 4
+atom(a) atom(b) r(a) r(b) p(a) p(b) -q(a) -q(b)

@@ -1,0 +1,106 @@
+fly(X) :- bird(X), not ab(X).
+-fly(X) :- not fly(X), object(X).
+bird(X) :- pigeon(X).
+bird(X) :- penguin(X).
+ab(X) :- penguin(X).
+ab(X) :- bird(X), brokenWing(X).
+    
+pigeon(tweety). 
+brokenWing(tweety).
+penguin(abby).
+object(tweety). 
+object(abby).
+
+Answer set is :- S = {-fly(tweety), -fly(abby)}
+
+Grounding:
+
+pigeon(tweety).
+brokenWing(tweety).
+penguin(abby).
+object(tweety). 
+object(abby).
+fly(tweety) :- bird(tweety), not ab(tweety).
+fly(abby) :- bird(abby), not ab(abby).
+-fly(tweety) :- not fly(tweety), object(tweety).
+-fly(abby) :- not fly(abby), object(abby).
+bird(tweety) :- pigeon(tweety).
+bird(abby) :- pigeon(abby).
+bird(tweety) :- penguin(tweety).
+bird(abby) :- penguin(abby).
+ab(tweety) :- penguin(tweety).
+ab(abby) :- penguin(abby).
+ab(tweety) :- bird(tweety), brokenWing(tweety).
+ab(abby) :- bird(abby), brokenWing(abby).
+
+Answer set definition :
+For this we have two rules of reduct:
+
+1. removing all rules containing not l such that l ∈ S;
+2. removing all other premises containing not.
+
+applying rule 1:
+        pigeon(tweety).
+        brokenWing(tweety).
+        penguin(abby).
+        object(tweety). 
+        object(abby).
+        fly(tweety) :- bird(tweety), not ab(tweety).
+        fly(abby) :- bird(abby), not ab(abby).
+        -fly(tweety) :- not fly(tweety), object(tweety).
+        -fly(abby) :- not fly(abby), object(abby).
+        bird(tweety) :- pigeon(tweety).
+        bird(abby) :- pigeon(abby).
+        bird(tweety) :- penguin(tweety).
+        bird(abby) :- penguin(abby).
+        ab(tweety) :- penguin(tweety).
+        ab(abby) :- penguin(abby).
+        ab(tweety) :- bird(tweety), brokenWing(tweety).
+        ab(abby) :- bird(abby), brokenWing(abby).
+
+apply rule 2:
+        pigeon(tweety).
+        brokenWing(tweety).
+        penguin(abby).
+        object(tweety). 
+        object(abby).
+        fly(tweety) :- bird(tweety).
+        fly(abby) :- bird(abby).
+        -fly(tweety) :- object(tweety).
+        -fly(abby) :- object(abby).
+        bird(tweety) :- pigeon(tweety).
+        bird(abby) :- pigeon(abby).
+        bird(tweety) :- penguin(tweety).
+        bird(abby) :- penguin(abby).
+        ab(tweety) :- penguin(tweety).
+        ab(abby) :- penguin(abby).
+        ab(tweety) :- bird(tweety), brokenWing(tweety).
+        ab(abby) :- bird(abby), brokenWing(abby).
+
+
+Part 2
+CWA :
+prof(X) | general_staff(X) :- uni_staff(X).
+uni_staff(X) :- prof(X).
+uni_staff(X) :- general_staff(X).
+teaching(X) :- prof(X), not ab(d1(X)).
+-teaching(X) :- general_staff(X).
+ab(d1(X)) :- on_leave(X).
+uni_staff(bob).
+prof(alice).
+prof(cole).
+
+Solution:
+
+uni_staff(bob).
+prof(alice).
+prof(cole).
+ab(d1(X)) :- on_leave(X).
+prof(X) | general_staff(X) :- uni_staff(X).
+uni_staff(X) :- prof(X).
+uni_staff(X) :- general_staff(X).
+teaching(X) :- prof(X), not ab(d1(X)).
+-teaching(X) :- general_staff(X).
+-teaching(X) :- not teaching(X), uni_staff(X), prof(X).
+-prof(X) :- not prof(X), uni_staff(X), prof(X).
+-general_staff(X) :- not general_staff(X), prof(X), uni_staff(X).
